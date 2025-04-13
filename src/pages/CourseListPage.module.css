@@ -1,0 +1,74 @@
+/* src/pages/CourseListPage.module.css */
+.courseListContainer {
+    padding: 1rem 0;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    /* Allow wrapping on smaller screens */
+    gap: 1rem;
+}
+
+.title {
+    margin: 0;
+    flex-grow: 1;
+    /* Take available space */
+}
+
+.searchInput {
+    padding: 0.6em 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 200px;
+    /* Minimum width */
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.errorMessage {
+    color: #dc3545;
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+}
+
+.noResults {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+}
+
+.courseGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Responsive grid */
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .searchInput {
+        background-color: #333;
+        border-color: #555;
+        color: rgba(255, 255, 255, 0.87);
+    }
+}

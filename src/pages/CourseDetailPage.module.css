@@ -1,0 +1,198 @@
+/* src/pages/CourseDetailPage.module.css */
+
+/* Composing errorMessage from CourseListPage is acceptable as it's a single class */
+.errorMessage {
+    composes: errorMessage from './CourseListPage.module.css';
+    margin-bottom: 1.5rem;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
+.errorContainer {
+    text-align: center;
+    padding: 2rem;
+}
+
+.detailContainer {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--background-color-secondary, #fff);
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.backLink {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    color: var(--accent-color);
+    /* Use variable */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.backLink:hover {
+    text-decoration: underline;
+    color: var(--accent-color-light);
+    /* Use variable */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    /* Align title top, button slightly lower */
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color, #eee);
+    padding-bottom: 1rem;
+}
+
+.title {
+    margin: 0;
+    font-size: 2.2em;
+    line-height: 1.2;
+    color: var(--text-color-primary);
+    flex-grow: 1;
+    /* Take available space */
+}
+
+.courseImage {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    background-color: var(--border-color-light, #eee);
+    /* Placeholder color using variable */
+    display: block;
+    /* Ensure it behaves like a block element */
+}
+
+.content {
+    line-height: 1.7;
+}
+
+.description {
+    margin-bottom: 2rem;
+    font-size: 1.1em;
+    color: var(--text-color-secondary);
+}
+
+.metaGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.02);
+    /* Subtle background */
+    border-radius: 6px;
+    border: 1px solid var(--border-color-light, #eee);
+}
+
+.metaItem {
+    font-size: 0.95em;
+    color: var(--text-color-secondary);
+}
+
+.metaItem strong {
+    color: var(--text-color-primary);
+    margin-right: 0.5em;
+    font-weight: 600;
+    /* Make strong tags slightly bolder */
+}
+
+/* Base status badge styles */
+.statusBadge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    /* Adjusted padding */
+    border-radius: 4px;
+    font-size: 0.85em;
+    /* Adjusted size */
+    font-weight: 600;
+    /* Use bolder font */
+    line-height: 1;
+    /* Ensure consistent height */
+    text-transform: capitalize;
+    color: white;
+    /* Default text color */
+    text-align: center;
+}
+
+/* Specific status styles - No 'composes' for compound selectors */
+.active {
+    background-color: #28a745;
+    /* Green */
+}
+
+.inactive {
+    background-color: #6c757d;
+    /* Gray */
+}
+
+.draft {
+    background-color: #ffc107;
+    /* Yellow */
+    color: #333;
+    /* Darker text for better contrast on yellow */
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+    .detailContainer {
+        background-color: var(--background-color-secondary-dark, #2a2a2a);
+        border-color: var(--border-color-dark, #444);
+    }
+
+    .header {
+        border-bottom-color: var(--border-color-dark, #444);
+    }
+
+    .title {
+        color: var(--text-color-primary-dark);
+    }
+
+    .description {
+        color: var(--text-color-secondary-dark);
+    }
+
+    .metaGrid {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: var(--border-color-dark, #444);
+    }
+
+    .metaItem {
+        color: var(--text-color-secondary-dark);
+    }
+
+    .metaItem strong {
+        color: var(--text-color-primary-dark);
+    }
+
+    .courseImage {
+        background-color: var(--border-color-dark, #444);
+        /* Darker placeholder */
+    }
+
+    /* Dark mode status badge adjustments (if needed) */
+    .draft {
+        /* Ensure text contrast on yellow is good in dark mode if needed */
+        /* color: #111; */
+    }
+
+    /* Adjust other badge colors if needed for dark theme aesthetics */
+    .active {
+        /* background-color: #34a853; */
+    }
+
+    .inactive {
+        /* background-color: #5f6368; */
+    }
+
+}

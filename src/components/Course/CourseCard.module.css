@@ -1,0 +1,120 @@
+/* src/components/Course/CourseCard.module.css */
+.card {
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    overflow: hidden;
+    /* Keep image corners rounded */
+    background-color: var(--background-color-secondary, #fff);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.image {
+    width: 100%;
+    height: 180px;
+    /* Fixed height for consistency */
+    object-fit: cover;
+    /* Cover the area, cropping if needed */
+    display: block;
+    background-color: #eee;
+    /* Placeholder color */
+}
+
+.content {
+    padding: 1rem;
+    flex-grow: 1;
+    /* Allow content to fill remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Push actions to the bottom */
+}
+
+.title {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--text-color-primary);
+}
+
+.instructor,
+.price,
+.status {
+    font-size: 0.9em;
+    color: var(--text-color-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.price {
+    font-weight: bold;
+}
+
+.statusBadge {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: capitalize;
+    color: white;
+}
+
+.statusBadge.active {
+    background-color: #28a745;
+}
+
+/* Green */
+.statusBadge.inactive {
+    background-color: #6c757d;
+}
+
+/* Gray */
+.statusBadge.draft {
+    background-color: #ffc107;
+    color: #333;
+}
+
+/* Yellow */
+
+
+.actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    /* Align buttons to the right */
+}
+
+/* Adjust button size if needed */
+.actions button {
+    padding: 0.4em 0.8em;
+    font-size: 0.9em;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .card {
+        border-color: var(--border-color-dark, #444);
+        background-color: var(--background-color-secondary-dark, #2a2a2a);
+    }
+
+    .title {
+        color: var(--text-color-primary-dark);
+    }
+
+    .instructor,
+    .price,
+    .status {
+        color: var(--text-color-secondary-dark);
+    }
+
+    .image {
+        background-color: #444;
+    }
+}

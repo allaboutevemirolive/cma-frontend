@@ -1,0 +1,42 @@
+/* src/pages/LoginPage.module.css */
+.loginContainer {
+    max-width: 400px;
+    margin: 4rem auto;
+    padding: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: var(--background-color-secondary, #f9f9f9);
+    /* Use CSS vars for theming */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-color-primary, #213547);
+}
+
+.errorMessage {
+    color: #dc3545;
+    /* Bootstrap danger color */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    text-align: center;
+}
+
+
+/* Add styles for the form elements if needed, or style within LoginForm.module.css */
+
+@media (prefers-color-scheme: dark) {
+    .loginContainer {
+        background-color: var(--background-color-secondary-dark, #2a2a2a);
+        border-color: #555;
+    }
+
+    .title {
+        color: var(--text-color-primary-dark, rgba(255, 255, 255, 0.87));
+    }
+}

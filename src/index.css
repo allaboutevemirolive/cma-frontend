@@ -1,68 +1,274 @@
+/* src/index.css */
+
+/* Import CSS variables first */
+@import './styles/variables.css';
+
+/*-----------------------------------------------------------------------------*/
+/* Reset & Base Styles                                                       */
+/*-----------------------------------------------------------------------------*/
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.6;
+    /* Slightly increased line-height for readability */
+    font-weight: 400;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+    color-scheme: light dark;
+    /* Let the browser know we support both */
+    color: var(--text-color-primary);
+    /* Use variable */
+    background-color: var(--background-color);
+    /* Use variable */
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--background-color);
+    /* Ensure body bg matches root */
+    font-size: 16px;
+    /* Base font size */
+    display: flex;
+    /* Use flex to push footer down if needed */
+    flex-direction: column;
+    /* Stack header, main, footer vertically */
+}
+
+/*-----------------------------------------------------------------------------*/
+/* Typography & Links                                                        */
+/*-----------------------------------------------------------------------------*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 0.75em;
+    /* Consistent bottom margin */
+    line-height: 1.3;
+    font-weight: 600;
+    /* Slightly bolder headings */
+    color: var(--text-color-primary);
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+    font-size: 2.2em;
 }
+
+/* Adjusted base h1 size */
+h2 {
+    font-size: 1.8em;
+}
+
+h3 {
+    font-size: 1.4em;
+}
+
+h4 {
+    font-size: 1.1em;
+}
+
+p {
+    margin-bottom: 1em;
+    /* Spacing between paragraphs */
+}
+
+a {
+    font-weight: 500;
+    color: var(--accent-color);
+    /* Use variable */
+    text-decoration: none;
+    /* Remove underline by default */
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--accent-color-light);
+    /* Use variable */
+    text-decoration: underline;
+    /* Add underline on hover */
+}
+
+/*-----------------------------------------------------------------------------*/
+/* Forms & Buttons (Base - Components will often override)                  */
+/*-----------------------------------------------------------------------------*/
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+    display: inline-block;
+    /* Ensure proper alignment and sizing */
+    border-radius: 6px;
+    /* Slightly smaller radius */
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: var(--background-color-secondary);
+    color: var(--text-color-primary);
+    border-color: var(--border-color);
+    cursor: pointer;
+    transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
+    text-align: center;
+    vertical-align: middle;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+button:hover:not(:disabled) {
+    border-color: var(--accent-color);
+    background-color: var(--background-color);
+    /* Slight change on hover */
+}
+
+button:focus,
+button:focus-visible {
+    outline: 2px solid var(--accent-color);
+    /* Custom focus outline */
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--background-color), 0 0 0 4px var(--accent-color-light);
+    /* More visible focus */
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 1em;
+    padding: 0.6em 1em;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    color: var(--text-color-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    /* Default to full width in forms */
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.15);
+    /* Subtle focus glow */
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-color-secondary);
+    opacity: 0.7;
+}
+
+
+/*-----------------------------------------------------------------------------*/
+/* Layout & Main Application Container                                        */
+/*-----------------------------------------------------------------------------*/
+
+#root {
+    max-width: 1280px;
+    /* Max width for content */
+    margin: 0 auto;
+    /* Center content horizontally */
+    padding: 1rem 2rem;
+    /* Padding around main content, reduced top/bottom */
+    flex-grow: 1;
+    /* Allow root to grow and push footer down */
+    width: 100%;
+    /* Ensure it takes full width within body */
+}
+
+main {
+    /* Main content area styles if needed, often handled by page components */
+    padding-top: 1rem;
+    /* Add some space below the header */
+    padding-bottom: 2rem;
+    /* Add some space above the footer */
+}
+
+
+/*-----------------------------------------------------------------------------*/
+/* Utility Classes (Optional)                                                */
+/*-----------------------------------------------------------------------------*/
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem !important;
+}
+
+.mb-2 {
+    margin-bottom: 1rem !important;
+}
+
+.mt-1 {
+    margin-top: 0.5rem !important;
+}
+
+.mt-2 {
+    margin-top: 1rem !important;
+}
+
+
+/*-----------------------------------------------------------------------------*/
+/* Remove/Override Default Vite Template Styles (if App.css is kept)        */
+/*-----------------------------------------------------------------------------*/
+
+/* If you keep App.css, you might want to override its centering */
+#root {
+    text-align: left;
+    /* Override text-align: center from App.css */
+}
+
+/* Remove logo styles if not used globally or handled by components */
+.logo {
+    /* remove or adjust */
+}
+
+.logo:hover {
+    /* remove or adjust */
+}
+
+.logo.react:hover {
+    /* remove or adjust */
+}
+
+@keyframes logo-spin {
+    /* remove or adjust */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    a:nth-of-type(2) .logo {
+        /* remove or adjust */
+        animation: none;
+    }
+}
+
+/* Remove .card styles if handled by specific components */
+.card {
+    /* remove or adjust */
+}
+
+.read-the-docs {
+    /* remove or adjust */
 }

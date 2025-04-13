@@ -1,0 +1,110 @@
+/* src/components/Common/Modal/Modal.module.css */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Semi-transparent black */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    /* Ensure it's above other content */
+    padding: 1rem;
+    /* Padding for smaller screens */
+}
+
+.modalContent {
+    background-color: var(--background-color, #fff);
+    color: var(--text-color-primary, #213547);
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    /* Max width for the modal */
+    width: 90%;
+    /* Responsive width */
+    max-height: 90vh;
+    /* Max height */
+    overflow-y: auto;
+    /* Allow scrolling if content is too tall */
+    position: relative;
+    /* For positioning the close button */
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color, #eee);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.modalTitle {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    color: var(--text-color-secondary, #888);
+    /* Reset default button styles */
+    border-radius: 4px;
+    font-weight: normal;
+    font-family: inherit;
+}
+
+.closeButton:hover {
+    color: var(--text-color-primary, #333);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: transparent;
+    /* Override default hover */
+}
+
+.modalBody {
+    /* Styles for the main content area */
+    margin-top: 1rem;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .modalContent {
+        background-color: var(--background-color-dark, #2a2a2a);
+        color: var(--text-color-primary-dark, rgba(255, 255, 255, 0.87));
+    }
+
+    .modalHeader {
+        border-bottom-color: var(--border-color-dark, #444);
+    }
+
+    .closeButton {
+        color: var(--text-color-secondary-dark, #aaa);
+    }
+
+    .closeButton:hover {
+        color: var(--text-color-primary-dark, #fff);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}

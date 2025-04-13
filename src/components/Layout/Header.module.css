@@ -1,0 +1,117 @@
+/* src/components/Layout/Header.module.css */
+.header {
+    background-color: var(--header-bg, #242424);
+    color: var(--header-text, rgba(255, 255, 255, 0.87));
+    padding: 0.8rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    /* Match #root padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo {
+    height: 2.5em;
+    /* Adjust size */
+    margin-right: 0.5em;
+    vertical-align: middle;
+    /* Align with text */
+}
+
+.appName {
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    /* Spacing between nav items */
+}
+
+.navLink {
+    color: var(--nav-link-color, #aaa);
+    text-decoration: none;
+    padding: 0.5em 0;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.navLink:hover {
+    color: var(--nav-link-hover-color, #fff);
+}
+
+/* Style for the active link */
+.navLink.activeLink {
+    color: var(--nav-link-active-color, #646cff);
+    font-weight: bold;
+}
+
+/* Optional: Add underline effect for active/hover */
+.navLink::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #646cff;
+    transition: width 0.3s ease;
+}
+
+.navLink:hover::after,
+.navLink.activeLink::after {
+    width: 100%;
+}
+
+
+.userInfo {
+    font-size: 0.9em;
+    color: #ccc;
+    /* Lighter text for user info */
+}
+
+
+/* Adjust button size/style in header */
+.nav button {
+    padding: 0.4em 0.8em;
+    font-size: 0.9em;
+}
+
+/* Light mode */
+@media (prefers-color-scheme: light) {
+    .header {
+        background-color: var(--header-bg-light, #f8f9fa);
+        color: var(--header-text-light, #343a40);
+    }
+
+    .navLink {
+        color: var(--nav-link-color-light, #555);
+    }
+
+    .navLink:hover {
+        color: var(--nav-link-hover-color-light, #000);
+    }
+
+    .navLink.activeLink {
+        color: var(--nav-link-active-color-light, #535bf2);
+    }
+
+    .userInfo {
+        color: #6c757d;
+    }
+}

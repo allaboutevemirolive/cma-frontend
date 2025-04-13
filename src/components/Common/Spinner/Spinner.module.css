@@ -1,0 +1,29 @@
+/* src/components/Common/Spinner/Spinner.module.css */
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #646cff;
+    /* Accent color */
+    animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark mode consideration */
+@media (prefers-color-scheme: dark) {
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-left-color: #747bff;
+        /* Lighter accent for dark mode */
+    }
+}

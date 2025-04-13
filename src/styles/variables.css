@@ -1,0 +1,50 @@
+/* src/styles/variables.css */
+:root {
+    /* Light Theme Colors */
+    --background-color: #ffffff;
+    --background-color-secondary: #f8f9fa;
+    --text-color-primary: #213547;
+    --text-color-secondary: #555;
+    --border-color: #dee2e6;
+    --border-color-light: #eee;
+    --accent-color: #646cff;
+    --accent-color-light: #747bff;
+    --danger-color: #dc3545;
+    --header-bg: #f8f9fa;
+    --header-text: #343a40;
+    --nav-link-color: #555;
+    --nav-link-hover-color: #000;
+    --nav-link-active-color: #535bf2;
+
+    /* Dark Theme Colors (within media query or applied via class) */
+    --background-color-dark: #242424;
+    --background-color-secondary-dark: #2a2a2a;
+    --text-color-primary-dark: rgba(255, 255, 255, 0.87);
+    --text-color-secondary-dark: #bbb;
+    --border-color-dark: #444;
+    --border-color-light-dark: #333;
+    --accent-color-dark: #747bff;
+    --header-bg-dark: #1a1a1a;
+    --header-text-dark: rgba(255, 255, 255, 0.87);
+    --nav-link-color-dark: #aaa;
+    --nav-link-hover-color-dark: #fff;
+    --nav-link-active-color-dark: #747bff;
+}
+
+/* Apply dark theme based on preference */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: var(--background-color-dark);
+        --background-color-secondary: var(--background-color-secondary-dark);
+        --text-color-primary: var(--text-color-primary-dark);
+        --text-color-secondary: var(--text-color-secondary-dark);
+        --border-color: var(--border-color-dark);
+        --border-color-light: var(--border-color-light-dark);
+        --accent-color: var(--accent-color-dark);
+        --header-bg: var(--header-bg-dark);
+        --header-text: var(--header-text-dark);
+        --nav-link-color: var(--nav-link-color-dark);
+        --nav-link-hover-color: var(--nav-link-hover-color-dark);
+        --nav-link-active-color: var(--nav-link-active-color-dark);
+    }
+}

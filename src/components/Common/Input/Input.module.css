@@ -1,0 +1,73 @@
+/* src/components/Common/Input/Input.module.css */
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* Ensure it takes full width in forms */
+    margin-bottom: 1rem;
+    /* Spacing between form elements */
+}
+
+.label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--text-color-secondary, #555);
+}
+
+.input {
+    padding: 0.75em 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    /* Take full width within its container */
+    box-sizing: border-box;
+    /* Include padding and border in the element's total width and height */
+}
+
+.input:focus {
+    border-color: #646cff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.15);
+}
+
+.input:disabled {
+    background-color: #e9ecef;
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.errorInput {
+    border-color: #dc3545;
+    /* Danger color */
+}
+
+.errorInput:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+}
+
+.errorMessage {
+    color: #dc3545;
+    /* Danger color */
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .label {
+        color: var(--text-color-secondary-dark, #bbb);
+    }
+
+    .input {
+        background-color: #333;
+        border-color: #555;
+        color: rgba(255, 255, 255, 0.87);
+    }
+
+    .input:disabled {
+        background-color: #444;
+    }
+}

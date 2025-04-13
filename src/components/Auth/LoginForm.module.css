@@ -1,0 +1,64 @@
+/* src/components/Auth/LoginForm.module.css */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.input {
+    padding: 0.75em 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.input:focus {
+    border-color: #646cff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.2);
+}
+
+.input:disabled {
+    background-color: #e9ecef;
+    opacity: 0.7;
+}
+
+
+.error {
+    color: #dc3545;
+    /* Bootstrap danger color */
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+.submitButton {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .label {
+        color: rgba(255, 255, 255, 0.87);
+    }
+
+    .input {
+        background-color: #333;
+        border-color: #555;
+        color: rgba(255, 255, 255, 0.87);
+    }
+
+    .input:disabled {
+        background-color: #444;
+    }
+}
