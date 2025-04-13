@@ -1,0 +1,37 @@
+services:
+  frontend:
+    container_name: cma-frontend-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+      # args:
+      #   VITE_API_BASE_URL: ${VITE_API_BASE_URL} # Example
+    ports:
+      # Map local port 3000 to container's Vite port 5173 (Vite default)
+      - "3000:5173" # Ensure this matches your Vite dev server port
+    volumes:
+      # Mount source code into the container (except node_modules)
+      - .:/app
+      # Use a volume for node_modules to avoid overriding container modules with host modules
+      - /app/node_modules
+      # Keep the pnpm store cached between builds for faster installs
+      - pnpm_store:/root/.local/share/pnpm/store/v3
+      # REMOVE or comment out the /app/dist volume for development, it's not needed
+      # - /app/dist
+    environment:
+      # Ensures Vite's HMR works correctly inside Docker
+      - WATCHPACK_POLLING=true # Or CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
+      # Pass runtime environment variables
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    # Override the default CMD from Dockerfile to run the dev server
+    # The `--host` flag makes Vite accessible from outside the container
+    command: pnpm dev --host
+    # Load environment variables from a .env file in the project root
+    env_file:
+      - .env
+
+# Define the named volume for the pnpm store cache
+volumes:
+  pnpm_store:

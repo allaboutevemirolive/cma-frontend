@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+# pnpm-lock.yaml # Keep this commented or remove if you prefer it in the context
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist
+build
+.tmp
+
+# Docker specific files (usually good to ignore these from the context itself)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+# nginx.conf
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# IDE/OS specific
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
