@@ -1,110 +1,126 @@
 /* src/components/Common/Modal/Modal.module.css */
 .overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    /* Semi-transparent black */
+    inset: 0;
+    /* Simpler way for top/left/right/bottom: 0 */
+    background-color: rgba(0, 0, 0, 0.65);
+    /* Slightly darker overlay */
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    /* Ensure it's above other content */
     padding: 1rem;
-    /* Padding for smaller screens */
+    animation: fadeIn 0.2s ease-out forwards;
+    /* Ensure animation stays */
 }
 
 .modalContent {
-    background-color: var(--background-color, #fff);
-    color: var(--text-color-primary, #213547);
-    padding: 1.5rem 2rem;
+    background-color: var(--background-color);
+    color: var(--text-color-primary);
+    padding: 0;
+    /* Remove padding, handle inside header/body */
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    /* Slightly larger radius */
+    box-shadow: var(--shadow-lg);
+    /* Use variable */
     max-width: 600px;
-    /* Max width for the modal */
-    width: 90%;
-    /* Responsive width */
+    width: 95%;
     max-height: 90vh;
-    /* Max height */
-    overflow-y: auto;
-    /* Allow scrolling if content is too tall */
+    overflow: hidden;
+    /* Prevent content spill before internal scroll */
+    display: flex;
+    flex-direction: column;
     position: relative;
-    /* For positioning the close button */
-    animation: fadeIn 0.3s ease-out;
+    animation: scaleUp 0.25s ease-out forwards;
+    /* Different animation */
 }
 
 .modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-color, #eee);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color-light);
+    padding: 1rem 1.5rem;
+    /* Consistent padding */
+    flex-shrink: 0;
+    /* Prevent header from shrinking */
 }
 
 .modalTitle {
     margin: 0;
-    font-size: 1.5em;
+    font-size: 1.3em;
+    /* Slightly adjusted */
+    font-weight: 600;
 }
 
 .closeButton {
     background: none;
     border: none;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    /* Adjusted */
     line-height: 1;
     cursor: pointer;
-    padding: 0.2rem 0.5rem;
-    color: var(--text-color-secondary, #888);
-    /* Reset default button styles */
-    border-radius: 4px;
-    font-weight: normal;
-    font-family: inherit;
+    padding: 0.2rem;
+    /* Small padding for click area */
+    color: var(--text-color-secondary);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .closeButton:hover {
-    color: var(--text-color-primary, #333);
-    background-color: rgba(0, 0, 0, 0.05);
-    border-color: transparent;
-    /* Override default hover */
+    color: var(--text-color-primary);
+    background-color: var(--border-color-light);
 }
 
 .modalBody {
-    /* Styles for the main content area */
-    margin-top: 1rem;
+    padding: 1.5rem;
+    /* Padding for content */
+    overflow-y: auto;
+    /* Scroll only the body */
+    flex-grow: 1;
+    /* Allow body to take available space */
 }
 
-/* Animation */
+/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: scale(0.95);
     }
 
     to {
         opacity: 1;
-        transform: scale(1);
     }
 }
 
-/* Dark mode */
+@keyframes scaleUp {
+    from {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
-    .modalContent {
-        background-color: var(--background-color-dark, #2a2a2a);
-        color: var(--text-color-primary-dark, rgba(255, 255, 255, 0.87));
+    .overlay {
+        background-color: rgba(0, 0, 0, 0.75);
     }
 
     .modalHeader {
-        border-bottom-color: var(--border-color-dark, #444);
+        border-bottom-color: var(--border-color);
     }
 
-    .closeButton {
-        color: var(--text-color-secondary-dark, #aaa);
-    }
-
+    /* Use standard dark border */
     .closeButton:hover {
-        color: var(--text-color-primary-dark, #fff);
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--border-color);
     }
 }

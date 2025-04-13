@@ -2,10 +2,13 @@
 
 /* Import CSS variables first */
 @import './styles/variables.css';
-@import "tailwindcss";
-@import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* NO Tailwind imports needed */
+/* @import "tailwindcss"; */
+/* @import "tw-animate-css"; */
+
+/* NO Tailwind custom variant needed */
+/* @custom-variant dark (&:is(.dark *)); */
 
 /*-----------------------------------------------------------------------------*/
 /* Reset & Base Styles                                                       */
@@ -17,12 +20,24 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    border-color: var(--border-color);
+    /* Default border color from variables */
+    border-style: solid;
+    /* Default border style */
+    border-width: 0;
+    /* Default border width to 0 */
+}
+
+html {
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+    /* Prevent layout shifts due to scrollbars */
+    overflow-y: scroll;
 }
 
 :root {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     line-height: 1.6;
-    /* Slightly increased line-height for readability */
     font-weight: 400;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -30,56 +45,78 @@
     -moz-osx-font-smoothing: grayscale;
 
     color-scheme: light dark;
-    /* Let the browser know we support both */
+    /* Inform browser about theme support */
     color: var(--text-color-primary);
-    /* Use variable */
     background-color: var(--background-color);
-    /* Use variable */
-    --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+
+    /* Keep shadcn/ui compatible CSS variables - they are standard CSS */
+    /* These are set based on your variables.css */
+    --radius: 0.5rem;
+    --background: var(--background-color);
+    --foreground: var(--text-color-primary);
+    --card: var(--background-color-secondary);
+    --card-foreground: var(--text-color-primary);
+    --popover: var(--background-color-secondary);
+    --popover-foreground: var(--text-color-primary);
+    --primary: var(--accent-color);
+    --primary-foreground: white;
+    /* Assuming white text on primary */
+    --secondary: var(--background-color-secondary);
+    --secondary-foreground: var(--text-color-primary);
+    --muted: var(--border-color-light);
+    --muted-foreground: var(--text-color-secondary);
+    --accent: var(--accent-color);
+    --accent-foreground: white;
+    /* Assuming white text on accent */
+    --destructive: var(--danger-color);
+    --destructive-foreground: white;
+    /* Assuming white text on destructive */
+    --border: var(--border-color);
+    --input: var(--border-color);
+    --ring: var(--accent-color);
+    /* Focus ring color */
+    /* chart colors are optional */
+    /* ... */
 }
+
+/* Dark mode overrides for shadcn/ui variables if needed directly */
+/* This relies on variables.css setting the base colors via prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Update shadcn variables if they differ significantly from base dark theme */
+        --background: var(--background-color);
+        --foreground: var(--text-color-primary);
+        --card: var(--background-color-secondary);
+        --card-foreground: var(--text-color-primary);
+        --popover: var(--background-color-secondary);
+        --popover-foreground: var(--text-color-primary);
+        --primary: var(--accent-color);
+        --primary-foreground: #111827;
+        /* Dark text on lighter primary */
+        --secondary: var(--background-color-secondary);
+        --secondary-foreground: var(--text-color-primary);
+        --muted: var(--border-color-light);
+        --muted-foreground: var(--text-color-secondary);
+        --accent: var(--accent-color);
+        --accent-foreground: #111827;
+        /* Dark text on lighter accent */
+        --destructive: var(--danger-color);
+        --destructive-foreground: white;
+        --border: var(--border-color);
+        --input: var(--border-color);
+        --ring: var(--accent-color);
+    }
+}
+
 
 body {
     min-width: 320px;
     min-height: 100vh;
-    background-color: var(--background-color);
-    /* Ensure body bg matches root */
     font-size: 16px;
-    /* Base font size */
     display: flex;
-    /* Use flex to push footer down if needed */
     flex-direction: column;
-    /* Stack header, main, footer vertically */
+    background-color: var(--background-color);
+    /* Apply theme background */
 }
 
 /*-----------------------------------------------------------------------------*/
@@ -93,24 +130,22 @@ h4,
 h5,
 h6 {
     margin-bottom: 0.75em;
-    /* Consistent bottom margin */
     line-height: 1.3;
     font-weight: 600;
-    /* Slightly bolder headings */
     color: var(--text-color-primary);
 }
 
+/* Using clamp for responsive headings */
 h1 {
-    font-size: 2.2em;
+    font-size: clamp(1.8rem, 1.521rem + 1.19vw, 2.2rem);
 }
 
-/* Adjusted base h1 size */
 h2 {
-    font-size: 1.8em;
+    font-size: clamp(1.5rem, 1.321rem + 0.76vw, 1.8rem);
 }
 
 h3 {
-    font-size: 1.4em;
+    font-size: clamp(1.2rem, 1.111rem + 0.38vw, 1.4rem);
 }
 
 h4 {
@@ -119,81 +154,73 @@ h4 {
 
 p {
     margin-bottom: 1em;
-    /* Spacing between paragraphs */
+    color: var(--text-color-secondary);
+    max-width: 70ch;
+    /* Improve readability by limiting line length */
 }
 
 a {
     font-weight: 500;
     color: var(--accent-color);
-    /* Use variable */
     text-decoration: none;
-    /* Remove underline by default */
     transition: color 0.2s ease;
 }
 
 a:hover {
     color: var(--accent-color-light);
-    /* Use variable */
     text-decoration: underline;
-    /* Add underline on hover */
 }
 
 /*-----------------------------------------------------------------------------*/
-/* Forms & Buttons (Base - Components will often override)                  */
+/* Forms & Buttons (Basic Fallbacks - Components Provide Specific Styles)   */
 /*-----------------------------------------------------------------------------*/
 
 button {
-    display: inline-block;
-    /* Ensure proper alignment and sizing */
-    border-radius: 6px;
-    /* Slightly smaller radius */
-    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
     padding: 0.6em 1.2em;
+    /* Basic padding */
     font-size: 1em;
     font-weight: 500;
-    font-family: inherit;
-    background-color: var(--background-color-secondary);
-    color: var(--text-color-primary);
-    border-color: var(--border-color);
-    cursor: pointer;
-    transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
-    text-align: center;
-    vertical-align: middle;
-}
-
-button:hover:not(:disabled) {
-    border-color: var(--accent-color);
-    background-color: var(--background-color);
-    /* Slight change on hover */
-}
-
-button:focus,
-button:focus-visible {
-    outline: 2px solid var(--accent-color);
-    /* Custom focus outline */
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--background-color), 0 0 0 4px var(--accent-color-light);
-    /* More visible focus */
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s, opacity 0.2s;
 }
 
 button:disabled {
-    opacity: 0.6;
     cursor: not-allowed;
+    opacity: var(--disabled-opacity);
 }
+
+button:focus-visible {
+    /* Use focus-visible for accessibility */
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
 
 input,
 select,
 textarea {
     font-family: inherit;
     font-size: 1em;
-    padding: 0.6em 1em;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: var(--border-radius);
+    padding: 0.75em 1em;
+    /* Slightly more vertical padding */
     background-color: var(--background-color);
     color: var(--text-color-primary);
     transition: border-color 0.2s, box-shadow 0.2s;
     width: 100%;
     /* Default to full width in forms */
+    box-sizing: border-box;
+    /* Include padding/border in width */
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-color-secondary);
+    opacity: 0.6;
 }
 
 input:focus,
@@ -201,188 +228,71 @@ select:focus,
 textarea:focus {
     border-color: var(--accent-color);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.15);
-    /* Subtle focus glow */
+    /* Subtle focus ring using theme variable */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 20%, transparent);
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: var(--text-color-secondary);
-    opacity: 0.7;
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: var(--disabled-bg);
+    opacity: var(--disabled-opacity);
+    cursor: not-allowed;
 }
 
 /*-----------------------------------------------------------------------------*/
-/* Layout & Main Application Container                                        */
+/* Base Layout                                                              */
 /*-----------------------------------------------------------------------------*/
 
 #root {
     max-width: 1280px;
-    /* Max width for content */
+    /* Content max width */
     margin: 0 auto;
-    /* Center content horizontally */
-    padding: 1rem 2rem;
-    /* Padding around main content, reduced top/bottom */
+    /* Center content */
+    padding: 0 1rem;
+    /* Horizontal padding */
     flex-grow: 1;
-    /* Allow root to grow and push footer down */
     width: 100%;
-    /* Ensure it takes full width within body */
+    display: flex;
+    flex-direction: column;
 }
 
 main {
-    /* Main content area styles if needed, often handled by page components */
-    padding-top: 1rem;
-    /* Add some space below the header */
-    padding-bottom: 2rem;
-    /* Add some space above the footer */
+    padding-top: 1.5rem;
+    /* Space below sticky header */
+    padding-bottom: 3rem;
+    /* Space above potential footer */
+    flex-grow: 1;
+    /* Allow main to fill vertical space */
 }
+
 
 /*-----------------------------------------------------------------------------*/
-/* Utility Classes (Optional)                                                */
-/*-----------------------------------------------------------------------------*/
-.text-center {
-    text-align: center;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.mb-1 {
-    margin-bottom: 0.5rem !important;
-}
-
-.mb-2 {
-    margin-bottom: 1rem !important;
-}
-
-.mt-1 {
-    margin-top: 0.5rem !important;
-}
-
-.mt-2 {
-    margin-top: 1rem !important;
-}
-
-/*-----------------------------------------------------------------------------*/
-/* Remove/Override Default Vite Template Styles (if App.css is kept)        */
+/* Remove Old/Vite Default Styles                                           */
 /*-----------------------------------------------------------------------------*/
 
-/* If you keep App.css, you might want to override its centering */
-#root {
-    text-align: left;
-    /* Override text-align: center from App.css */
-}
-
-/* Remove logo styles if not used globally or handled by components */
-.logo {
-    /* remove or adjust */
-}
-
-.logo:hover {
-    /* remove or adjust */
-}
-
-.logo.react:hover {
-    /* remove or adjust */
+/* Explicitly reset any styles potentially added by the default template */
+.logo,
+.logo:hover,
+.logo.react:hover,
+.card,
+.read-the-docs {
+    all: unset;
+    /* Reset all properties */
+    display: none;
+    /* Hide them if they linger */
 }
 
 @keyframes logo-spin {
-    /* remove or adjust */
+    /* Remove definition */
 }
 
+/* Reset animation specifically if needed */
 @media (prefers-reduced-motion: no-preference) {
     a:nth-of-type(2) .logo {
-        /* remove or adjust */
         animation: none;
     }
 }
 
-/* Remove .card styles if handled by specific components */
-.card {
-    /* remove or adjust */
-}
-
-.read-the-docs {
-    /* remove or adjust */
-}
-
-@theme inline {
-    --radius-sm: calc(var(--radius) - 4px);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) + 4px);
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
-}
-
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
-}
+/* NO Tailwind @layer base needed */
+/* @layer base { ... } */

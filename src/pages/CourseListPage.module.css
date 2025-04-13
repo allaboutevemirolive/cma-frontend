@@ -1,74 +1,231 @@
 /* src/pages/CourseListPage.module.css */
-.courseListContainer {
-    padding: 1rem 0;
+
+/* Base container for the page content */
+.pageContainer {
+    padding: 1.5rem 0;
+    /* Add vertical padding */
 }
 
+/* Header/Controls Area */
 .controls {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
     flex-wrap: wrap;
     /* Allow wrapping on smaller screens */
+    justify-content: space-between;
+    align-items: center;
+    /* Align title and actions container vertically */
     gap: 1rem;
+    /* Gap between title and actions */
+    margin-bottom: 2rem;
+    /* Space below controls */
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color-light);
 }
 
 .title {
     margin: 0;
-    flex-grow: 1;
-    /* Take available space */
+    font-size: clamp(1.6rem, 1.4rem + 1vw, 2rem);
+    /* Responsive title */
+    font-weight: 600;
+    flex: 1 1 auto;
+    /* Allow title to grow but also shrink */
+    min-width: 150px;
+    /* Prevent title from getting too squished */
+    align-items: baseline;
 }
 
-.searchInput {
-    padding: 0.6em 1em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    min-width: 200px;
-    /* Minimum width */
-}
-
-.center {
+.actionsContainer {
     display: flex;
+    flex-wrap: nowrap;
+    /* Keep search and button together initially */
+    gap: 1rem;
+    /* --- CHANGE HERE --- */
+    align-items: baseline;
+    /* Align based on text baseline */
+    /* align-items: center; */
+    /* Revert to this if baseline looks worse */
+    /* --- END CHANGE --- */
+    flex: 1 1 400px;
+    /* Allow actions to take space, adjust basis */
+    justify-content: flex-end;
+}
+
+/* Specific style for the search input wrapper to remove bottom margin */
+.searchControl {
+    min-width: 250px;
+    /* Keep a min-width for search */
+    /* If baseline alignment isn't perfect, you might need slight adjustments */
+    /* padding-bottom: 1px; /* Example: tiny adjustment if needed */
+}
+
+.searchControl>.inputGroup {
+    /* Target the inputGroup *inside* searchControl */
+    margin-bottom: 0 !important;
+    /* Override default margin from Input.module.css */
+}
+
+
+@media (max-width: 768px) {
+
+    /* Adjusted breakpoint */
+    .controls {
+        gap: 1.5rem;
+        /* Increase gap when stacking */
+    }
+
+    .actionsContainer {
+        flex-basis: 100%;
+        /* Make actions take full width sooner */
+        justify-content: flex-start;
+        /* Revert to center alignment when stacking might look better */
+        /* align-items: center; */
+    }
+
+    .searchControl {
+        flex-grow: 1;
+        /* Allow search to grow */
+        min-width: 200px;
+        /* Reduce min-width */
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    /* Stacking breakpoint */
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+        /* Stretch items full width */
+    }
+
+    .actionsContainer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+        /* Reduce gap when stacked */
+    }
+
+    .searchControl {
+        min-width: 0;
+        /* Remove min-width */
+    }
+
+    /* Ensure button takes full width when stacked */
+    .actionsContainer>button {
+        width: 100%;
+    }
+}
+
+
+/* Loading State */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    /* Stack spinner and text */
     justify-content: center;
-    padding: 2rem;
+    align-items: center;
+    padding: 4rem 1rem;
+    min-height: 40vh;
+    /* Ensure it takes visible space */
+    text-align: center;
 }
 
+.loadingText {
+    margin-top: 1rem;
+    color: var(--text-color-secondary);
+    font-size: 1em;
+}
+
+/* Error State */
 .errorMessage {
-    color: #dc3545;
-    text-align: center;
-    padding: 1rem;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
+    display: flex;
+    /* Align icon and text */
+    align-items: center;
+    justify-content: center;
+    color: var(--danger-color);
+    background-color: color-mix(in srgb, var(--danger-color) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--danger-color) 30%, transparent);
+    padding: 1rem 1.5rem;
+    /* More padding */
+    margin: 3rem auto;
+    /* More vertical margin, centered */
+    max-width: 600px;
+    border-radius: var(--border-radius);
+    font-size: 0.95em;
+    /* Slightly larger */
+    font-weight: 500;
 }
 
-.noResults {
-    text-align: center;
-    padding: 2rem;
-    color: #888;
+.errorMessage svg {
+    /* Style icon */
+    margin-right: 0.75em;
+    flex-shrink: 0;
+    /* Prevent icon shrinking */
 }
 
+@media (prefers-color-scheme: dark) {
+    .errorMessage {
+        background-color: color-mix(in srgb, var(--danger-color) 15%, #111827 85%);
+        /* Adjust dark bg mix */
+        border-color: color-mix(in srgb, var(--danger-color) 40%, transparent);
+    }
+}
+
+/* No Results State */
+.noResultsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 1rem;
+    min-height: 40vh;
+    /* Match loading height */
+    text-align: center;
+    color: var(--text-color-secondary);
+}
+
+.noResultsIcon {
+    width: 60px;
+    height: 60px;
+    color: var(--border-color);
+    /* Use a subtle color */
+    margin-bottom: 1.5rem;
+}
+
+.noResultsText {
+    font-size: 1.1em;
+    max-width: 400px;
+}
+
+
+/* Course Grid */
 .courseGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    /* Responsive grid */
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    /* Optimize minmax for better filling */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 1.75rem;
+    /* Slightly larger gap */
+    margin-bottom: 2.5rem;
+    /* More space below grid */
 }
 
+/* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
-    margin-top: 2rem;
+    gap: 0.8rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color-light);
+    /* Separator */
 }
 
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-    .searchInput {
-        background-color: #333;
-        border-color: #555;
-        color: rgba(255, 255, 255, 0.87);
-    }
+.pageInfo {
+    font-size: 0.9em;
+    color: var(--text-color-secondary);
+    margin: 0 0.5rem;
+    /* Add horizontal margin */
+    user-select: none;
 }

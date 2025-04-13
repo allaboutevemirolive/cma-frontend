@@ -2,26 +2,23 @@
 .form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    /* Consistent gap */
+    gap: 1.2rem;
+    /* Slightly larger gap for form */
 }
 
 .formError {
-    color: #721c24;
-    /* Darker red for errors */
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 0.75rem 1.25rem;
+    color: var(--danger-color);
+    background-color: color-mix(in srgb, var(--danger-color) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--danger-color) 30%, transparent);
+    padding: 0.8rem 1.2rem;
     margin-bottom: 1rem;
-    border-radius: 0.25rem;
-    text-align: center;
+    border-radius: var(--border-radius);
     font-size: 0.9em;
 }
 
-/* Use styles from Input.module.css where applicable */
+/* Inherit styles from Input for consistency */
 .inputGroup {
     composes: inputGroup from '../Common/Input/Input.module.css';
-    /* Reuse styles */
 }
 
 .label {
@@ -36,92 +33,151 @@
     composes: errorInput from '../Common/Input/Input.module.css';
 }
 
+/* Keep this base error style */
+
 .textarea {
     composes: input from '../Common/Input/Input.module.css';
-    /* Base input styles */
-    min-height: 80px;
+    min-height: 100px;
+    /* Increased height */
     resize: vertical;
-    /* Allow vertical resize */
     font-family: inherit;
-    /* Ensure consistent font */
 }
 
+/* REMOVED this rule - styling handled by applying both .textarea and .errorInput in JSX */
+/*
 .textarea.errorInput {
-    border-color: #dc3545;
+    composes: errorInput;
 }
-
-.textarea:focus {
-    /* Inherits focus style from input */
-}
-
+*/
 
 .select {
     composes: input from '../Common/Input/Input.module.css';
-    /* Base input styles */
     appearance: none;
-    /* Remove default arrow */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%236C757D"><path d="M7 10l5 5 5-5H7z"/></svg>');
     background-repeat: no-repeat;
-    background-position: right 1em top 50%;
-    background-size: 0.65em auto;
+    background-position: right 0.8em center;
+    background-size: 1.1em;
     padding-right: 2.5em;
-    /* Space for arrow */
 }
 
+/* REMOVED this rule - styling handled by applying both .select and .errorInput in JSX */
+/*
 .select.errorInput {
-    border-color: #dc3545;
+    composes: errorInput;
+}
+*/
+
+/* Dark mode select arrow */
+@media (prefers-color-scheme: dark) {
+    .select {
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%239CA3AF"><path d="M7 10l5 5 5-5H7z"/></svg>');
+        /* Lighter arrow */
+    }
+
+    .formError {
+        color: var(--danger-color);
+        background-color: color-mix(in srgb, var(--danger-color) 20%, transparent);
+        border-color: color-mix(in srgb, var(--danger-color) 40%, transparent);
+    }
+}
+
+/* File Input Specifics */
+.fileInputLabel {
+    composes: label;
+    /* Reuse label style */
 }
 
 .fileInput {
-    /* Basic file input styling */
-    padding: 0.5em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9em;
-    width: 100%;
-    box-sizing: border-box;
+    composes: input from '../Common/Input/Input.module.css';
+    /* Base style */
+    padding: 0.5em 0.8em;
+    /* Adjust padding */
+    font-size: 0.95em;
+    color: var(--text-color-secondary);
+    /* Placeholder-like color */
     cursor: pointer;
+    /* Hiding default browser file input appearance */
+    color: transparent;
+    /* Make default text transparent */
 }
 
-.fileInput:disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
+/* Style the "Choose file" text */
+.fileInput::before {
+    content: 'Choose Image';
+    display: inline-block;
+    background: var(--background-color-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: calc(var(--border-radius) - 2px);
+    padding: 0.4em 0.8em;
+    margin-right: 0.8em;
+    color: var(--text-color-primary);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
 }
+
+.fileInput:hover::before {
+    background-color: color-mix(in srgb, var(--background-color-secondary) 95%, black 5%);
+}
+
+/* Show filename after selection */
+.fileInput::after {
+    content: attr(data-filename);
+    /* Display filename stored in data attribute */
+    color: var(--text-color-primary);
+    /* Make filename visible */
+    margin-left: 0.5em;
+    font-size: 0.9em;
+    display: inline-block;
+    /* Ensure it displays */
+    vertical-align: middle;
+    /* Align with button */
+    max-width: calc(100% - 10em);
+    /* Prevent overflow */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* REMOVED this rule - styling handled by applying both .fileInput and .errorInput in JSX */
+/*
+.fileInput.errorInput {
+    composes: errorInput;
+}
+*/
+
 
 .imagePreviewContainer {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
     display: flex;
     align-items: center;
     gap: 1rem;
+    padding: 0.5rem;
+    background-color: var(--border-color-light);
+    border-radius: var(--border-radius);
 }
 
 .imagePreview {
-    max-width: 150px;
-    max-height: 100px;
+    width: 80px;
+    /* Fixed size */
+    height: 60px;
     border-radius: 4px;
-    border: 1px solid #eee;
-    object-fit: contain;
+    object-fit: cover;
+    /* Use cover */
+    border: 1px solid var(--border-color);
 }
 
 .removeImageButton {
-    padding: 0.3em 0.6em !important;
-    /* Override default button padding if needed */
-    font-size: 0.8em !important;
-    background-color: #f8d7da !important;
-    color: #721c24 !important;
-    border-color: #f5c6cb !important;
+    composes: small danger from '../Common/Button/Button.module.css';
+    /* Smaller, danger button */
+    margin-left: auto;
+    /* Push to the right */
 }
-
-.removeImageButton:hover:not(:disabled) {
-    background-color: #f1b0b7 !important;
-    border-color: #ec959f !important;
-}
-
 
 .infoText {
     font-size: 0.9em;
-    color: #555;
+    color: var(--text-color-secondary);
     margin: 0.5rem 0;
 }
 
@@ -129,36 +185,7 @@
     margin-top: 1.5rem;
     display: flex;
     justify-content: flex-end;
-    /* Align buttons to the right */
     gap: 1rem;
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .formError {
-        background-color: #471a21;
-        color: #f8d7da;
-        border-color: #a71d2a;
-    }
-
-    .textarea,
-    .select,
-    .fileInput {
-        background-color: #333;
-        border-color: #555;
-        color: rgba(255, 255, 255, 0.87);
-    }
-
-    .select {
-        /* SVG needs fill color adjusted for dark mode */
-        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ccc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-    }
-
-    .infoText {
-        color: #bbb;
-    }
-
-    .imagePreview {
-        border-color: #555;
-    }
+    border-top: 1px solid var(--border-color-light);
+    padding-top: 1.5rem;
 }

@@ -1,8 +1,9 @@
 // src/components/Auth/LoginForm.tsx
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Button from '../Common/Button/Button';
+import Input from '../Common/Input/Input'; // Use the refined Input
 import styles from './LoginForm.module.css';
 
 interface LoginFormProps {
@@ -11,13 +12,8 @@ interface LoginFormProps {
 }
 
 const LoginSchema = Yup.object().shape({
-    username: Yup.string()
-        .min(2, 'Too Short!')
-        .max(50, 'Too Long!')
-        .required('Username is required'),
-    password: Yup.string()
-        .min(6, 'Password must be at least 6 characters')
-        .required('Password is required'),
+    username: Yup.string().required('Username is required'),
+    password: Yup.string().required('Password is required'),
 });
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
@@ -27,39 +23,44 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
             validationSchema={LoginSchema}
             onSubmit={async (values, { setSubmitting }) => {
                 await onSubmit(values);
-                setSubmitting(false); // Formik's submitting state, distinct from parent isLoading
+                setSubmitting(false);
             }}
         >
-            {({ isSubmitting }) => ( // Use Formik's isSubmitting state if needed
+            {({ isSubmitting, errors, touched }) => ( // Get errors and touched from Formik
                 <Form className={styles.form}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="username" className={styles.label}>Username</label>
-                        <Field
-                            type="text"
-                            id="username"
-                            name="username"
-                            className={styles.input}
-                            disabled={isLoading}
-                        />
-                        <ErrorMessage name="username" component="div" className={styles.error} />
-                    </div>
+                    <Field name="username">
+                        {({ field }: any) => ( // Use Field render prop
+                            <Input // Use Input component
+                                {...field}
+                                id="username"
+                                label="Username"
+                                type="text"
+                                error={touched.username ? errors.username : undefined} // Pass error state
+                                disabled={isLoading || isSubmitting}
+                                autoComplete="username"
+                            />
+                        )}
+                    </Field>
 
-                    <div className={styles.formGroup}>
-                        <label htmlFor="password" className={styles.label}>Password</label>
-                        <Field
-                            type="password"
-                            id="password"
-                            name="password"
-                            className={styles.input}
-                            disabled={isLoading}
-                        />
-                        <ErrorMessage name="password" component="div" className={styles.error} />
-                    </div>
+                    <Field name="password">
+                         {({ field }: any) => (
+                            <Input
+                                {...field}
+                                id="password"
+                                label="Password"
+                                type="password"
+                                error={touched.password ? errors.password : undefined}
+                                disabled={isLoading || isSubmitting}
+                                autoComplete="current-password"
+                            />
+                        )}
+                    </Field>
 
                     <Button
                         type="submit"
                         variant="primary"
-                        isLoading={isLoading} // Use the loading state from the parent (useAuth)
+                        size="large" // Make login button slightly larger
+                        isLoading={isLoading || isSubmitting}
                         disabled={isLoading || isSubmitting}
                         className={styles.submitButton}
                     >

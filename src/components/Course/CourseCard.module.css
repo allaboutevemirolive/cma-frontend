@@ -1,120 +1,141 @@
 /* src/components/Course/CourseCard.module.css */
 .card {
-    border: 1px solid var(--border-color, #ddd);
-    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
     overflow: hidden;
-    /* Keep image corners rounded */
-    background-color: var(--background-color-secondary, #fff);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease;
+    background-color: var(--background-color-secondary);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    /* Make card fill grid cell height */
 }
 
 .card:hover {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    /* Subtle lift effect */
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    /* 16:9 Aspect Ratio */
+    background-color: var(--border-color-light);
+    overflow: hidden;
 }
 
 .image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 180px;
-    /* Fixed height for consistency */
+    height: 100%;
     object-fit: cover;
-    /* Cover the area, cropping if needed */
     display: block;
-    background-color: #eee;
-    /* Placeholder color */
+    transition: transform 0.3s ease;
+}
+
+.card:hover .image {
+    transform: scale(1.05);
+    /* Slight zoom on hover */
 }
 
 .content {
-    padding: 1rem;
+    padding: 1rem 1.2rem;
+    /* Adjusted padding */
     flex-grow: 1;
-    /* Allow content to fill remaining space */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    /* Push actions to the bottom */
+}
+
+.titleLink {
+    text-decoration: none;
+    color: inherit;
+    /* Inherit text color */
 }
 
 .title {
-    font-size: 1.2em;
+    font-size: 1.15em;
+    /* Adjusted size */
+    font-weight: 600;
     margin-top: 0;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
+    color: var(--text-color-primary);
+    display: -webkit-box;
+    /* Truncate long titles */
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 2.6em;
+    /* Reserve space for 2 lines */
+    transition: color 0.2s;
+}
+
+.titleLink:hover .title {
+    color: var(--accent-color);
+}
+
+.metaInfo {
+    margin-bottom: 1rem;
+    font-size: 0.9em;
+    color: var(--text-color-secondary);
+    flex-grow: 1;
+    /* Push actions down */
+}
+
+.metaItem {
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.metaLabel {
+    font-weight: 500;
     color: var(--text-color-primary);
 }
 
-.instructor,
-.price,
-.status {
-    font-size: 0.9em;
-    color: var(--text-color-secondary);
-    margin-bottom: 0.5rem;
-}
-
 .price {
-    font-weight: bold;
+    font-weight: 600;
+    color: var(--text-color-primary);
 }
 
 .statusBadge {
     display: inline-block;
-    padding: 0.2em 0.5em;
+    padding: 0.25em 0.6em;
     border-radius: 4px;
     font-size: 0.8em;
-    font-weight: bold;
+    /* Smaller badge */
+    font-weight: 600;
     text-transform: capitalize;
     color: white;
+    line-height: 1.2;
 }
 
 .statusBadge.active {
-    background-color: #28a745;
+    background-color: var(--success-color);
 }
 
-/* Green */
 .statusBadge.inactive {
-    background-color: #6c757d;
+    background-color: var(--text-color-secondary);
 }
 
-/* Gray */
 .statusBadge.draft {
-    background-color: #ffc107;
-    color: #333;
+    background-color: var(--warning-color);
+    color: var(--warning-text-color);
 }
-
-/* Yellow */
-
 
 .actions {
-    margin-top: 1rem;
+    margin-top: auto;
+    /* Push to bottom */
+    padding-top: 0.5rem;
+    /* Space above actions */
+    border-top: 1px solid var(--border-color-light);
     display: flex;
     gap: 0.5rem;
     justify-content: flex-end;
-    /* Align buttons to the right */
-}
-
-/* Adjust button size if needed */
-.actions button {
-    padding: 0.4em 0.8em;
-    font-size: 0.9em;
-}
-
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-    .card {
-        border-color: var(--border-color-dark, #444);
-        background-color: var(--background-color-secondary-dark, #2a2a2a);
-    }
-
-    .title {
-        color: var(--text-color-primary-dark);
-    }
-
-    .instructor,
-    .price,
-    .status {
-        color: var(--text-color-secondary-dark);
-    }
-
-    .image {
-        background-color: #444;
-    }
 }

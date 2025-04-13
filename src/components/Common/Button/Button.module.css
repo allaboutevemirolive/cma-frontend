@@ -1,135 +1,96 @@
 /* src/components/Common/Button/Button.module.css */
-
-/* Base Button Styles */
 .button {
-    padding: 0.6em 1.2em;
-    /* Default (medium) padding */
-    border-radius: 6px;
-    /* Slightly adjusted radius */
-    border: 1px solid transparent;
-    font-size: 1em;
-    /* Default (medium) font size */
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
     display: inline-flex;
-    /* Use inline-flex for better alignment with icons/text */
     align-items: center;
     justify-content: center;
     gap: 0.5em;
-    /* Space between icon and text if used */
+    padding: 0.6em 1.2em;
+    /* Medium padding */
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+    font-size: 1em;
+    /* Medium size */
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     text-align: center;
     vertical-align: middle;
     line-height: 1.5;
-    /* Ensure consistent line height */
     user-select: none;
-    /* Prevent text selection */
     white-space: nowrap;
-    /* Prevent text wrapping */
 }
 
 /* Disabled State */
 .button:disabled {
-    opacity: 0.65;
+    opacity: var(--disabled-opacity);
     cursor: not-allowed;
     box-shadow: none;
-    /* Remove shadow on disabled */
 }
 
-/* Focus State (using focus-visible for better accessibility) */
+/* Focus State */
 .button:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--background-color), 0 0 0 4px var(--accent-color-light);
+    /* Optional: Add a ring effect */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
-/* Fallback for browsers not supporting focus-visible (less ideal) */
-.button:focus {
-    outline: none;
-    /* Remove default outline */
-    box-shadow: 0 0 0 2px var(--background-color), 0 0 0 4px var(--accent-color-light);
-}
+/* --- Variants --- */
 
-
-/*--------------------------*/
-/* Variants                 */
-/*--------------------------*/
-
-/* Primary Variant (Darker, main action) */
+/* Primary */
 .primary {
-    background-color: var(--accent-color, #646cff);
-    color: #ffffff;
-    border-color: var(--accent-color, #646cff);
+    background-color: var(--accent-color);
+    color: white;
+    /* Ensure high contrast */
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .primary:hover:not(:disabled) {
-    background-color: var(--accent-color-light, #747bff);
-    border-color: var(--accent-color-light, #747bff);
+    background-color: var(--accent-color-light);
+    border-color: var(--accent-color-light);
 }
 
-.primary:focus-visible,
-.primary:focus {
-    outline-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--background-color), 0 0 0 4px var(--accent-color);
-}
-
-
-/* Secondary Variant (Lighter, alternative action) */
+/* Secondary */
 .secondary {
-    background-color: var(--background-color-secondary, #f9f9f9);
-    color: var(--text-color-primary, #213547);
-    border-color: var(--border-color, #ccc);
+    background-color: var(--background-color-secondary);
+    color: var(--text-color-primary);
+    border-color: var(--border-color);
 }
 
 .secondary:hover:not(:disabled) {
-    border-color: var(--accent-color, #646cff);
-    background-color: var(--background-color, #fff);
-    /* Slight background change */
-}
-
-.secondary:focus-visible,
-.secondary:focus {
     border-color: var(--accent-color);
-    /* Ensure border highlights */
-    outline-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--background-color), 0 0 0 4px var(--accent-color-light);
+    background-color: color-mix(in srgb, var(--background-color-secondary) 95%, black 5%);
 }
 
-/* Danger Variant (Destructive actions) */
+/* Danger */
 .danger {
-    background-color: var(--danger-color, #dc3545);
+    background-color: var(--danger-color);
     color: white;
-    border-color: var(--danger-color, #dc3545);
+    border-color: var(--danger-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .danger:hover:not(:disabled) {
-    background-color: #c82333;
-    /* Darker red */
-    border-color: #bd2130;
+    background-color: var(--danger-color-dark);
+    border-color: var(--danger-color-dark);
 }
 
-.danger:focus-visible,
-.danger:focus {
-    outline-color: #c82333;
-    box-shadow: 0 0 0 2px var(--background-color), 0 0 0 4px rgba(220, 53, 69, 0.5);
-    /* Red glow */
+.danger:focus-visible {
+    outline-color: var(--danger-color-dark);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger-color) 30%, transparent);
 }
 
 
-/*--------------------------*/
-/* Sizes                    */
-/*--------------------------*/
-
+/* --- Sizes --- */
 .small {
     padding: 0.4em 0.8em;
     font-size: 0.875em;
 }
 
 .medium {
-    /* Default styles already apply */
-    padding: 0.6em 1.2em;
-    font-size: 1em;
+    /* Defaults apply */
 }
 
 .large {
@@ -137,69 +98,42 @@
     font-size: 1.1em;
 }
 
+/* --- Loading State Specifics --- */
+/* Example: Add spinner styles if needed */
+.button.loading {
+    /* Style when isLoading prop is true, maybe adjust opacity */
+    opacity: 0.8;
+}
 
-/*--------------------------*/
-/* Dark Mode Adjustments    */
-/*--------------------------*/
+.spinner {
+    composes: spinner from '../Spinner/Spinner.module.css';
+    /* Reuse spinner */
+    width: 1em;
+    /* Scale spinner to font size */
+    height: 1em;
+    border-width: 2px;
+    margin-right: 0.5em;
+}
 
+/* Adjust spinner color for button variants */
+.primary .spinner {
+    border-left-color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.secondary .spinner {
+    border-left-color: var(--accent-color);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.danger .spinner {
+    border-left-color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Dark mode adjustments for secondary spinner */
 @media (prefers-color-scheme: dark) {
-
-    /* Primary variant in dark mode */
-    .primary {
-        background-color: var(--accent-color-dark, #747bff);
-        color: #1a1a1a;
-        /* Darker text for contrast */
-        border-color: var(--accent-color-dark, #747bff);
-    }
-
-    .primary:hover:not(:disabled) {
-        background-color: #8a90ff;
-        /* Slightly lighter */
-        border-color: #8a90ff;
-    }
-
-    .primary:focus-visible,
-    .primary:focus {
-        outline-color: var(--accent-color-dark);
-        box-shadow: 0 0 0 2px var(--background-color-dark), 0 0 0 4px var(--accent-color-dark);
-    }
-
-
-    /* Secondary variant in dark mode */
-    .secondary {
-        background-color: var(--background-color-secondary-dark, #2a2a2a);
-        color: var(--text-color-primary-dark, rgba(255, 255, 255, 0.87));
-        border-color: var(--border-color-dark, #555);
-    }
-
-    .secondary:hover:not(:disabled) {
-        border-color: var(--accent-color-dark, #747bff);
-        background-color: #3a3a3a;
-        /* Slightly lighter background */
-    }
-
-    .secondary:focus-visible,
-    .secondary:focus {
-        border-color: var(--accent-color-dark);
-        outline-color: var(--accent-color-dark);
-        box-shadow: 0 0 0 2px var(--background-color-dark), 0 0 0 4px var(--accent-color-dark);
-    }
-
-    /* Danger variant in dark mode (adjust if needed for contrast) */
-    .danger {
-        /* Usually the light mode danger colors work okay, but adjust if needed */
-        /* Example: Slightly less saturated red if default is too bright */
-        /* background-color: #d9534f; */
-        /* border-color: #d9534f; */
-    }
-
-    .danger:hover:not(:disabled) {
-        /* background-color: #c9302c; */
-        /* border-color: #ac2925; */
-    }
-
-    .danger:focus-visible,
-    .danger:focus {
-        box-shadow: 0 0 0 2px var(--background-color-dark), 0 0 0 4px rgba(220, 53, 69, 0.6);
+    .secondary .spinner {
+        border-color: rgba(255, 255, 255, 0.2);
     }
 }

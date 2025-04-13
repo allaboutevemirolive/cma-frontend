@@ -1,7 +1,7 @@
 // src/components/Common/Modal/Modal.tsx
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import Button from '../Button/Button';
+// Removed Button import, assuming close is now styled internally
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -12,7 +12,6 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
-    // Handle closing modal with Escape key
     useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -20,9 +19,13 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
             }
         };
         if (isOpen) {
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
             window.addEventListener('keydown', handleEsc);
+        } else {
+            document.body.style.overflow = ''; // Restore scrolling
         }
         return () => {
+            document.body.style.overflow = ''; // Ensure cleanup
             window.removeEventListener('keydown', handleEsc);
         };
     }, [isOpen, onClose]);
@@ -31,26 +34,26 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
         return null;
     }
 
-    // Use createPortal to render the modal at the end of the body
     return ReactDOM.createPortal(
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true">
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
-                    {title && <h2 className={styles.modalTitle}>{title}</h2>}
-                    <Button
+                    {title && <h2 className={styles.modalTitle} id="modal-title">{title}</h2>}
+                    <button
                         onClick={onClose}
                         className={styles.closeButton}
                         aria-label="Close modal"
+                        type="button" // Explicitly set type
                     >
-                        × {/* Cross symbol */}
-                    </Button>
+                        × {/* Use HTML entity */}
+                    </button>
                 </div>
                 <div className={styles.modalBody}>
                     {children}
                 </div>
             </div>
         </div>,
-        document.body // Mount the modal directly in the body
+        document.body
     );
 };
 
