@@ -2,15 +2,16 @@
 import React, { useState, useRef } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { Course } from '../../types'; // Removed unused 'User' import
+import { Course } from '../../types'; // Assuming User type is nested in Course or not directly needed here
 import { createCourse, updateCourse } from '../../services/api'; // Import API functions
 import Button from '../Common/Button/Button';
 import Input from '../Common/Input/Input'; // Using our custom Input
 import styles from './CourseForm.module.css';
-import { useAuth } from '../../hooks/useAuth'; // To get logged-in user ID
+// Removed useAuth import as ID is passed via prop for creation
 
 interface CourseFormProps {
     initialValues?: Course; // Pass existing course data for editing
+    userId?: number;        // Pass this explicitly for NEW courses (required if initialValues is undefined)
     onSuccess: (course: Course) => void; // Callback on successful submission
     onCancel: () => void; // Callback for cancelling
 }
@@ -26,11 +27,11 @@ const CourseSchema = Yup.object().shape({
         .typeError('Price must be a number')
         .positive('Price must be positive')
         .required('Price is required'),
-    // instructor_id is required for creation, handled separately
+    // instructor_id validation happens implicitly by requiring userId prop or initialValues
     status: Yup.string()
         .oneOf(['active', 'inactive', 'draft'], 'Invalid status')
         .required('Status is required'),
-    image: Yup.mixed().optional() // Optional file validation
+    image: Yup.mixed<File | null | string>().optional() // Handle File, null, or string (URL)
         .test('fileSize', 'File too large (max 2MB)', (value) => {
             if (!value || !(value instanceof File)) return true; // Allow no file or non-File types (like URLs when editing)
             return value.size <= 2 * 1024 * 1024; // 2MB limit
@@ -41,7 +42,7 @@ const CourseSchema = Yup.object().shape({
         }),
 });
 
-// Extend Course type for form values (instructor_id is required, image can be File)
+// Type for form values handled by Formik
 interface CourseFormValues extends Omit<Course, 'id' | 'created_at' | 'updated_at' | 'instructor' | 'price' | 'image'> {
     price: number | string; // Allow string input, convert later
     instructor_id: number | undefined; // Needed for submission
@@ -49,8 +50,7 @@ interface CourseFormValues extends Omit<Course, 'id' | 'created_at' | 'updated_a
 }
 
 
-const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCancel }) => {
-    const { user } = useAuth(); // Get logged-in user (assuming it has an ID)
+const CourseForm: React.FC<CourseFormProps> = ({ initialValues, userId, onSuccess, onCancel }) => {
     const [formError, setFormError] = useState<string | null>(null);
     const isEditing = Boolean(initialValues);
     const fileInputRef = useRef<HTMLInputElement>(null); // Ref for file input
@@ -61,14 +61,16 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
         description: initialValues?.description || '',
         price: initialValues?.price || '', // Keep as string initially for input field
         status: initialValues?.status || 'draft',
-        instructor_id: initialValues?.instructor?.id || user?.id, // Use logged-in user ID as default/fallback
-        image: initialValues?.image || null, // Existing image URL or null
+        // Use instructor ID from initialValues if editing, otherwise use the userId prop for creation
+        instructor_id: initialValues?.instructor?.id ?? userId, // Use nullish coalescing
+        image: initialValues?.image || null, // Existing image URL or null for creation
     };
 
-    if (!formInitialValues.instructor_id && !isEditing) {
-        console.error("Instructor ID is missing for new course creation.");
-        // Handle this case - maybe disable form or show an error
-        // For now, we'll let validation catch it if needed by the API call.
+    // Perform a check early if instructor ID is missing for creation
+    if (!isEditing && typeof userId !== 'number') {
+        console.error("ERROR: CourseForm requires a valid 'userId' number prop when creating a new course.");
+        // Optionally, you could return an error message component here instead of the form
+        // return <div className={styles.formError}>Cannot create course: Missing instructor information.</div>;
     }
 
 
@@ -76,57 +78,55 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
         values: CourseFormValues,
         { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
     ) => {
-        setFormError(null);
+        setFormError(null); // Clear previous errors
 
-        if (!values.instructor_id) {
-            setFormError("Instructor ID is required.");
+        // Re-check instructor_id before submitting (should be set by initialValues or userId prop)
+        if (typeof values.instructor_id !== 'number') {
+            setFormError("Instructor ID is missing or invalid.");
             setSubmitting(false);
             return;
         }
 
-        // Define the payload type explicitly to allow File | null | undefined
-        // This makes the intention clearer to TypeScript.
-        const payload: {
-            title: string;
-            description: string;
-            price: string;
-            status: 'active' | 'inactive' | 'draft';
-            instructor_id: number;
-            image?: File | null; // Explicitly allow File or null
-        } = {
+        // Prepare payload type explicitly for API functions
+        // Omit fields not sent in the payload body (like the nested instructor object)
+        type ApiPayload = Omit<CourseCreatePayload, 'image'> & { image?: File | null };
+
+        const payload: ApiPayload = {
             title: values.title,
             description: values.description,
             price: String(values.price), // Ensure price is a string for the API
             status: values.status,
-            instructor_id: values.instructor_id,
-            // Image handling:
-            // If it's a file, include it.
-            // If it's explicitly null (user removed it), include null.
-            // Otherwise (it's a string URL or undefined), omit it from the initial payload object.
+            instructor_id: values.instructor_id, // Ensure instructor_id is set
+            // Conditionally add 'image' based on its type
             ...(values.image instanceof File && { image: values.image }),
-            ...(values.image === null && { image: null }),
+            ...(values.image === null && { image: null }), // Send null if explicitly set for removal
         };
 
         try {
             let result: Course;
             if (isEditing && initialValues?.id) {
-                // Ensure payload type matches updateCourse expectation (Partial<...>)
-                // The 'as any' cast might be needed if TS has trouble inferring the complex conditional type for image
-                result = await updateCourse(initialValues.id, payload as any);
+                // Use updateCourse for edits (handles PATCH)
+                result = await updateCourse(initialValues.id, payload);
                 alert('Course updated successfully!');
             } else {
-                // Ensure instructor_id is present for creation
-                if (!payload.instructor_id) throw new Error("Instructor ID is missing.");
-                // Ensure payload type matches createCourse expectation
-                // The createCourse function differentiates based on payload.image type
-                // The 'as any' cast might be needed here too.
-                result = await createCourse(payload as any);
-                alert('Course created successfully!');
+                // Use createCourse for new courses
+                // Ensure the payload matches CourseCreatePayload structure
+                 const createPayload: CourseCreatePayload = {
+                    ...payload,
+                    instructor_id: payload.instructor_id, // Already validated as number
+                    image: values.image instanceof File ? values.image : undefined // Only pass if File
+                 };
+                 // Handle the case where payload.image might be null, but createCourse handles File | undefined
+                 if (payload.image === null && createPayload.hasOwnProperty('image')) {
+                    delete createPayload.image; // Don't send null image for create
+                 }
+
+                 result = await createCourse(createPayload);
+                 alert('Course created successfully!');
             }
-            onSuccess(result); // Call the success callback
+            onSuccess(result); // Call the success callback with the returned course data
         } catch (error: any) {
             console.error('Course form submission error:', error);
-            // Extract specific error messages if the API provides them
             const apiErrors = error.response?.data;
             let errorMessage = `Failed to ${isEditing ? 'update' : 'create'} course.`;
             if (apiErrors && typeof apiErrors === 'object') {
@@ -144,16 +144,19 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
         }
     };
 
-    // Helper to get image URL for preview (copied from CourseCard/DetailPage for consistency)
+    // Helper to get image URL for preview or placeholder
     const getImageUrl = (imagePath?: string | null): string | null => {
-        const placeholderImage = '/vite.svg'; // Default placeholder
+        const placeholderImage = '/vite.svg';
         if (!imagePath) {
-            return isEditing ? null : placeholderImage; // Show nothing if editing and no image, else placeholder
+            // Show placeholder only if creating, show nothing if editing and no image
+            return !isEditing ? placeholderImage : null;
         }
+        // If it's already a full URL (from API response), use it directly
         if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
             return imagePath;
         }
-        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api', '');
+        // Otherwise, assume it's a relative path from MEDIA_URL (less common now with full URLs from API)
+        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api', ''); // Get domain root
         return `${baseUrl}${imagePath}`;
     };
 
@@ -162,12 +165,15 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
             initialValues={formInitialValues}
             validationSchema={CourseSchema}
             onSubmit={handleSubmit}
-            enableReinitialize // Allows form to update if initialValues prop changes
+            enableReinitialize // Update form if initialValues prop changes (useful for edit form)
         >
+            {/* Formik render props provide form state and helpers */}
             {({ isSubmitting, setFieldValue, errors, touched, values }) => (
                 <Form className={styles.form}>
+                    {/* Display general form errors */}
                     {formError && <div className={styles.formError}>{formError}</div>}
 
+                    {/* Course Title Field */}
                     <Field name="title">
                         {({ field }: any) => (
                             <Input
@@ -175,12 +181,13 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
                                 id="title"
                                 label="Course Title"
                                 placeholder="e.g., Introduction to React"
-                                error={touched.title && errors.title}
+                                error={touched.title ? errors.title : undefined}
                                 disabled={isSubmitting}
                             />
                         )}
                     </Field>
 
+                    {/* Description Field */}
                     <Field name="description">
                         {({ field }: any) => (
                             <div className={styles.inputGroup}>
@@ -198,6 +205,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
                         )}
                     </Field>
 
+                    {/* Price Field */}
                     <Field name="price">
                         {({ field }: any) => (
                             <Input
@@ -207,12 +215,13 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
                                 type="number"
                                 step="0.01"
                                 placeholder="e.g., 29.99"
-                                error={touched.price && errors.price}
+                                error={touched.price ? errors.price : undefined}
                                 disabled={isSubmitting}
                             />
                         )}
                     </Field>
 
+                    {/* Status Field */}
                     <Field name="status">
                         {({ field }: any) => (
                             <div className={styles.inputGroup}>
@@ -232,29 +241,33 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
                         )}
                     </Field>
 
-                    {/* Instructor ID - Hidden field, assuming it's set from context or initialValues */}
+                    {/* Instructor ID - Hidden field to hold the value */}
                     <Field type="hidden" name="instructor_id" />
-                    {/* Optional: Display instructor if editing */}
+                    {/* Display instructor info for context */}
                     {isEditing && initialValues?.instructor && (
                         <p className={styles.infoText}>Instructor: {initialValues.instructor.username}</p>
                     )}
+                    {!isEditing && userId && ( // Display instructor info if creating and ID is passed
+                        <p className={styles.infoText}>Instructor: You (ID: {userId})</p>
+                    )}
 
-                    {/* Image Upload */}
+                    {/* Image Upload Section */}
                     <div className={styles.inputGroup}>
                         <label htmlFor="image" className={styles.label}>
                             Course Image (Optional, max 2MB, PNG/JPG)
                         </label>
-                        {/* Display current image preview if editing and image exists (and is a string URL) */}
+
+                        {/* Existing Image Preview (only when editing with a string URL) */}
                         {isEditing && typeof values.image === 'string' && values.image && (
                             <div className={styles.imagePreviewContainer}>
                                 <img src={getImageUrl(values.image) ?? ''} alt="Current course" className={styles.imagePreview} />
                                 <Button
                                     type="button"
-                                    variant="secondary" // Use secondary or create a specific style
-                                    size="small" // Use the size prop
+                                    variant="secondary"
+                                    size="small"
                                     onClick={() => {
-                                        setFieldValue('image', null); // Set to null to indicate removal intent
-                                        if (fileInputRef.current) fileInputRef.current.value = ''; // Clear file input visually
+                                        setFieldValue('image', null); // Set to null to indicate removal
+                                        if (fileInputRef.current) fileInputRef.current.value = '';
                                     }}
                                     disabled={isSubmitting}
                                     className={styles.removeImageButton}
@@ -263,25 +276,34 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
                                 </Button>
                             </div>
                         )}
-                        {/* Display preview if a new file is selected */}
+
+                        {/* New File Preview (only when a file is selected) */}
                         {values.image instanceof File && (
                             <div className={styles.imagePreviewContainer}>
                                 <img
                                     src={URL.createObjectURL(values.image)}
-                                    alt="Preview"
+                                    alt="New image preview"
                                     className={styles.imagePreview}
-                                    // Clean up object URL when component unmounts or file changes
-                                    onLoad={(e) => URL.revokeObjectURL(e.currentTarget.src)}
+                                    // Clean up object URL when the component might re-render causing the URL to become invalid
+                                    // Note: This might cause brief flicker if component re-renders for other reasons.
+                                    // Consider more robust preview/cleanup logic if needed.
+                                    onLoad={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        // Optional: Keep URL until unmount? More complex state needed.
+                                         URL.revokeObjectURL(target.src); // Revoke immediately after load
+                                    }}
                                 />
                             </div>
                         )}
 
+                        {/* File Input */}
                         <input
                             id="image"
                             name="image"
                             type="file"
                             ref={fileInputRef}
                             onChange={(event) => {
+                                // Set the field value to the selected File object or null
                                 setFieldValue("image", event.currentTarget.files ? event.currentTarget.files[0] : null);
                             }}
                             className={styles.fileInput}
@@ -291,7 +313,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ initialValues, onSuccess, onCan
                         <ErrorMessage name="image" component="div" className={styles.errorMessage} />
                     </div>
 
-
+                    {/* Action Buttons */}
                     <div className={styles.formActions}>
                         <Button type="submit" variant="primary" isLoading={isSubmitting} disabled={isSubmitting}>
                             {isEditing ? 'Update Course' : 'Create Course'}

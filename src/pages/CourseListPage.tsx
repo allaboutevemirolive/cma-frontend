@@ -5,28 +5,27 @@ import { Course, PaginatedResponse } from '../types';
 import CourseCard from '../components/Course/CourseCard';
 import Button from '../components/Common/Button/Button';
 import Spinner from '../components/Common/Spinner/Spinner';
-import Modal from '../components/Common/Modal/Modal'; // Assuming Modal component exists
-import CourseForm from '../components/Course/CourseForm'; // Assuming CourseForm component exists
+import Modal from '../components/Common/Modal/Modal';
+import CourseForm from '../components/Course/CourseForm';
 import styles from './CourseListPage.module.css';
+import { useAuth } from '../hooks/useAuth'; // Import useAuth
 
 const CourseListPage: React.FC = () => {
+    const { user, isLoading: isAuthLoading } = useAuth(); // Get user and auth loading state
     const [coursesResponse, setCoursesResponse] = useState<PaginatedResponse<Course> | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isLoadingCourses, setIsLoadingCourses] = useState<boolean>(true); // Renamed state
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-    const [page, setPage] = useState<number>(1); // For pagination
+    const [page, setPage] = useState<number>(1);
 
     const fetchCourses = useCallback(async (currentPage: number, search: string) => {
-        setIsLoading(true);
+        setIsLoadingCourses(true); // Use the renamed state
         setError(null);
         try {
             const params = {
                 page: currentPage,
                 search: search || undefined,
-                // Add other filters/ordering here if needed
-                // status: 'active',
-                // ordering: '-price',
             };
             const data = await listCourses(params);
             setCoursesResponse(data);
@@ -34,31 +33,23 @@ const CourseListPage: React.FC = () => {
             setError(err.message || 'Failed to fetch courses.');
             console.error("Fetch courses error:", err);
         } finally {
-            setIsLoading(false);
+            setIsLoadingCourses(false); // Use the renamed state
         }
-    }, []); // Dependencies: Add any other filter states if they exist
+    }, []);
 
     useEffect(() => {
-        // Debounce search or fetch directly on change/submit
         fetchCourses(page, searchTerm);
-    }, [fetchCourses, page, searchTerm]); // Re-fetch when page or searchTerm changes
+    }, [fetchCourses, page, searchTerm]);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
-        setPage(1); // Reset to first page on new search
+        setPage(1);
     };
-
-    // Optional: Debounced search handler
-    // const debouncedFetch = useCallback(debounce((p, s) => fetchCourses(p, s), 500), [fetchCourses]);
-    // useEffect(() => {
-    //     debouncedFetch(page, searchTerm);
-    // }, [debouncedFetch, page, searchTerm]);
-
 
     const handleCreateSuccess = () => {
         setIsCreateModalOpen(false);
-        fetchCourses(1, ''); // Refetch courses on page 1 after creation
-        setSearchTerm(''); // Clear search
+        fetchCourses(1, '');
+        setSearchTerm('');
         setPage(1);
     };
 
@@ -66,8 +57,7 @@ const CourseListPage: React.FC = () => {
         if (window.confirm(`Are you sure you want to delete course ${courseId}?`)) {
             try {
                 await deleteCourse(courseId);
-                // Refetch or remove from state
-                fetchCourses(page, searchTerm); // Easiest way is to refetch current page
+                fetchCourses(page, searchTerm);
                 alert('Course deleted successfully.');
             } catch (err: any) {
                 alert(`Failed to delete course: ${err.message || 'Unknown error'}`);
@@ -76,10 +66,14 @@ const CourseListPage: React.FC = () => {
     }
 
     const handlePageChange = (newPage: number) => {
-        if (newPage > 0) { // Basic validation
+        if (newPage > 0) {
             setPage(newPage);
         }
     }
+
+    // Determine if the create button should be enabled
+    // Needs authentication context loaded AND user object available
+    const canCreateCourse = !isAuthLoading && !!user?.id;
 
     return (
         <div className={styles.courseListContainer}>
@@ -92,16 +86,22 @@ const CourseListPage: React.FC = () => {
                     onChange={handleSearchChange}
                     className={styles.searchInput}
                 />
-                <Button variant="primary" onClick={() => setIsCreateModalOpen(true)}>
+                <Button
+                    variant="primary"
+                    onClick={() => setIsCreateModalOpen(true)}
+                    disabled={!canCreateCourse} // Disable if user ID isn't ready
+                    title={!canCreateCourse ? "Loading user info..." : "Create a new course"} // Tooltip hint
+                >
                     Create Course
                 </Button>
             </div>
 
-            {isLoading && <div className={styles.center}><Spinner /></div>}
+            {(isLoadingCourses || isAuthLoading) && <div className={styles.center}><Spinner /></div>} {/* Show spinner if courses or auth is loading */}
             {error && <p className={styles.errorMessage}>{error}</p>}
 
-            {!isLoading && !error && coursesResponse && (
+            {!isLoadingCourses && !error && coursesResponse && (
                 <>
+                    {/* ... Course Grid and Pagination ... */}
                     {coursesResponse.results.length === 0 ? (
                         <p className={styles.noResults}>No courses found.</p>
                     ) : (
@@ -116,14 +116,14 @@ const CourseListPage: React.FC = () => {
                     <div className={styles.pagination}>
                         <Button
                             onClick={() => handlePageChange(page - 1)}
-                            disabled={!coursesResponse.previous}
+                            disabled={!coursesResponse.previous || isLoadingCourses}
                         >
                             Previous
                         </Button>
-                        <span>Page {page} of {Math.ceil((coursesResponse.count || 0) / (coursesResponse.results.length || 1))}</span>
+                        <span>Page {page} of {Math.ceil((coursesResponse.count || 0) / (coursesResponse.results?.length || 1))}</span> {/* Added null check for results */}
                         <Button
                             onClick={() => handlePageChange(page + 1)}
-                            disabled={!coursesResponse.next}
+                            disabled={!coursesResponse.next || isLoadingCourses}
                         >
                             Next
                         </Button>
@@ -132,15 +132,18 @@ const CourseListPage: React.FC = () => {
             )}
 
             {/* Create Course Modal */}
-            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
-                <h2>Create New Course</h2>
-                {/* Pass instructor_id if needed, maybe from logged-in user context */}
-                <CourseForm
-                    // initialValues can be pre-filled if needed
-                    onSuccess={handleCreateSuccess}
-                    onCancel={() => setIsCreateModalOpen(false)}
-                />
-            </Modal>
+            {/* Only render Modal content if user ID is available to pass */}
+            {canCreateCourse && (
+                 <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
+                    <h2>Create New Course</h2>
+                    <CourseForm
+                        // Explicitly pass the logged-in user's ID for creation
+                        userId={user.id} // We know user.id exists because of canCreateCourse
+                        onSuccess={handleCreateSuccess}
+                        onCancel={() => setIsCreateModalOpen(false)}
+                    />
+                </Modal>
+            )}
         </div>
     );
 };
