@@ -1,19 +1,22 @@
 // src/pages/NotFoundPage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../components/Common/Button/Button';
+import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
 
 const NotFoundPage: React.FC = () => {
     return (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-            <h1 style={{ fontSize: '6em', margin: '0', color: '#aaa' }}>404</h1>
-            <h2 style={{ margin: '0 0 1rem 0', color: '#888' }}>Page Not Found</h2>
-            <p style={{ marginBottom: '2rem', color: '#666' }}>
-                Sorry, the page you are looking for does not exist.
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-theme(spacing.14))] text-center px-4">
+            <h1 className="text-8xl font-bold text-primary/50 mb-2">404</h1>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Page Not Found</h2>
+            <p className="text-muted-foreground mb-8 max-w-md">
+                Oops! The page you are looking for doesn't seem to exist. It might have been moved or deleted.
             </p>
-            <Link to="/courses">
-                <Button variant="primary">Go to Courses</Button>
-            </Link>
+            <Button asChild>
+                <Link to="/courses">
+                     <Home className="mr-2 h-4 w-4" /> Go to Courses
+                </Link>
+            </Button>
         </div>
     );
 };

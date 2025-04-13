@@ -1,9 +1,10 @@
-// src/components/Auth/LoginForm.tsx
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { useFormik } from 'formik'; // Use useFormik hook for easier integration
 import * as Yup from 'yup';
-import Button from '../Common/Button/Button';
-import styles from './LoginForm.module.css';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react"; // Spinner icon
 
 interface LoginFormProps {
     onSubmit: (values: { username: string; password: string }) => Promise<void>;
@@ -21,53 +22,56 @@ const LoginSchema = Yup.object().shape({
 });
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
+    const formik = useFormik({
+        initialValues: { username: '', password: '' },
+        validationSchema: LoginSchema,
+        onSubmit: async (values, { }) => {
+            await onSubmit(values);
+            // No need to call setSubmitting(false) here as isLoading prop controls the button state
+        },
+    });
+
     return (
-        <Formik
-            initialValues={{ username: '', password: '' }}
-            validationSchema={LoginSchema}
-            onSubmit={async (values, { setSubmitting }) => {
-                await onSubmit(values);
-                setSubmitting(false); // Formik's submitting state, distinct from parent isLoading
-            }}
-        >
-            {({ isSubmitting }) => ( // Use Formik's isSubmitting state if needed
-                <Form className={styles.form}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="username" className={styles.label}>Username</label>
-                        <Field
-                            type="text"
-                            id="username"
-                            name="username"
-                            className={styles.input}
-                            disabled={isLoading}
-                        />
-                        <ErrorMessage name="username" component="div" className={styles.error} />
-                    </div>
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                    id="username"
+                    type="text"
+                    placeholder="your_username"
+                    {...formik.getFieldProps('username')} // Spread Formik props
+                    disabled={isLoading}
+                    aria-invalid={formik.touched.username && !!formik.errors.username}
+                />
+                {formik.touched.username && formik.errors.username ? (
+                    <p className="text-sm text-destructive">{formik.errors.username}</p>
+                ) : null}
+            </div>
 
-                    <div className={styles.formGroup}>
-                        <label htmlFor="password" className={styles.label}>Password</label>
-                        <Field
-                            type="password"
-                            id="password"
-                            name="password"
-                            className={styles.input}
-                            disabled={isLoading}
-                        />
-                        <ErrorMessage name="password" component="div" className={styles.error} />
-                    </div>
+            <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    {...formik.getFieldProps('password')} // Spread Formik props
+                    disabled={isLoading}
+                    aria-invalid={formik.touched.password && !!formik.errors.password}
+                />
+                {formik.touched.password && formik.errors.password ? (
+                    <p className="text-sm text-destructive">{formik.errors.password}</p>
+                ) : null}
+            </div>
 
-                    <Button
-                        type="submit"
-                        variant="primary"
-                        isLoading={isLoading} // Use the loading state from the parent (useAuth)
-                        disabled={isLoading || isSubmitting}
-                        className={styles.submitButton}
-                    >
-                        Login
-                    </Button>
-                </Form>
-            )}
-        </Formik>
+            <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full"
+            >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Login
+            </Button>
+        </form>
     );
 };
 

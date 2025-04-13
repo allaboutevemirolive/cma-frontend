@@ -2,66 +2,72 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Course } from '../../types';
-import Button from '../Common/Button/Button';
-import styles from './CourseCard.module.css';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { getImageUrl, formatPrice } from '@/lib/utils'; // Use helpers
+import { Trash2, Eye } from 'lucide-react'; // Icons
 
 interface CourseCardProps {
     course: Course;
-    onDelete: (id: number) => void; // Add onDelete prop
+    onDelete: (id: number) => void;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
-    const placeholderImage = '/vite.svg'; // Or a dedicated placeholder image URL
+    const placeholderImage = '/vite.svg';
 
-    // Function to safely handle potential API base URL prefix for images
-    const getImageUrl = (imagePath?: string | null) => {
-        if (!imagePath) {
-            return placeholderImage;
+    const getStatusVariant = (status: Course['status']): React.ComponentProps<typeof Badge>['variant'] => {
+        switch (status) {
+            case 'active': return 'success'; // Requires adding 'success' variant to Badge component
+            case 'inactive': return 'secondary';
+            case 'draft': return 'warning'; // Requires adding 'warning' variant to Badge component
+            default: return 'default';
         }
-        // If imagePath is already a full URL, use it directly
-        if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-            return imagePath;
-        }
-        // Otherwise, prepend the base URL (adjust if your API serves files differently)
-        // This assumes VITE_API_BASE_URL is like 'http://localhost:8000/api'
-        // and image paths are relative to the domain root, e.g., '/media/courses/image.png'
-        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api', ''); // Get domain root
-        return `${baseUrl}${imagePath}`;
     };
 
+    // You might need to add custom variants to your Badge component (src/components/ui/badge.tsx)
+    // Example for success variant:
+    // success: "border-transparent bg-green-100 text-green-800 hover:bg-green-100/80 dark:bg-green-900/20 dark:text-green-400",
+    // Example for warning variant:
+    // warning: "border-transparent bg-yellow-100 text-yellow-800 hover:bg-yellow-100/80 dark:bg-yellow-900/20 dark:text-yellow-400",
 
     return (
-        <div className={styles.card}>
-            <img
-                src={getImageUrl(course.image)}
-                alt={`${course.title} thumbnail`}
-                className={styles.image}
-                // Add error handling for images if needed
-                onError={(e) => (e.currentTarget.src = placeholderImage)}
-            />
-            <div className={styles.content}>
-                <h3 className={styles.title}>{course.title}</h3>
-                <p className={styles.instructor}>
-                    Instructor: {course.instructor?.username || 'N/A'}
-                </p>
-                <p className={styles.price}>Price: ${parseFloat(course.price).toFixed(2)}</p>
-                <p className={styles.status}>Status: <span className={`${styles.statusBadge} ${styles[course.status]}`}>{course.status}</span></p>
-                <div className={styles.actions}>
-                    <Link to={`/courses/${course.id}`}>
-                        <Button variant="secondary" size="small">View Details</Button>
-                    </Link>
-                    {/* Add Delete Button - Consider role-based access */}
-                    <Button
-                        variant="danger" // You'll need to add a 'danger' variant to Button.module.css
-                        size="small"
-                        onClick={() => onDelete(course.id)}
-                        style={{ backgroundColor: '#dc3545', color: 'white' }} // Quick danger styling
-                    >
-                        Delete
-                    </Button>
+        <Card className="flex flex-col overflow-hidden">
+            <CardHeader className="p-0">
+                <img
+                    src={getImageUrl(course.image, placeholderImage)}
+                    alt={`${course.title} thumbnail`}
+                    className="aspect-video w-full object-cover" // aspect-video ensures consistent ratio
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = placeholderImage;
+                    }}
+                    loading="lazy" // Add lazy loading
+                />
+            </CardHeader>
+            <CardContent className="flex-grow p-4 space-y-2">
+                <CardTitle className="text-lg line-clamp-2">{course.title}</CardTitle> {/* Limit title lines */}
+                <div className="text-sm text-muted-foreground space-y-1">
+                    <p>Instructor: {course.instructor?.username || 'N/A'}</p>
+                    <p className="font-semibold">{formatPrice(course.price)}</p>
+                    <p>Status: <Badge variant={getStatusVariant(course.status)} className="capitalize">{course.status}</Badge></p>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+            <CardFooter className="p-4 pt-0 flex justify-end gap-2">
+                <Button variant="outline" size="sm" asChild>
+                    <Link to={`/courses/${course.id}`}>
+                        <Eye className="mr-2 h-4 w-4" /> View
+                    </Link>
+                </Button>
+                <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => onDelete(course.id)}
+                >
+                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                </Button>
+            </CardFooter>
+        </Card>
     );
 };
 
