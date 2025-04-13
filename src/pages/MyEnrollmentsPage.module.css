@@ -1,0 +1,213 @@
+/* src/pages/MyEnrollmentsPage.module.css */
+
+.pageContainer {
+    padding: 1.5rem 0;
+}
+
+.title {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color-light);
+    font-size: clamp(1.6rem, 1.4rem + 1vw, 2rem);
+    /* Responsive title */
+    font-weight: 600;
+}
+
+/* --- Loading / Error / No Results States --- */
+/* Reuse styles from CourseListPage for consistency */
+.stateContainer {
+    /* Common container for loading, error, no results */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 1rem;
+    min-height: 40vh;
+    text-align: center;
+    color: var(--text-color-secondary);
+}
+
+.loadingText {
+    margin-top: 1rem;
+    font-size: 1em;
+}
+
+.errorMessage {
+    /* Inherit or copy from CourseListPage.module.css */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--danger-color);
+    background-color: color-mix(in srgb, var(--danger-color) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--danger-color) 30%, transparent);
+    padding: 1rem 1.5rem;
+    max-width: 600px;
+    border-radius: var(--border-radius);
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+.errorMessage svg {
+    margin-right: 0.75em;
+    flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .errorMessage {
+        background-color: color-mix(in srgb, var(--danger-color) 15%, #111827 85%);
+        border-color: color-mix(in srgb, var(--danger-color) 40%, transparent);
+    }
+}
+
+
+.noResultsIcon {
+    width: 60px;
+    height: 60px;
+    color: var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.noResultsText {
+    font-size: 1.1em;
+    max-width: 450px;
+    /* Slightly wider */
+    margin-bottom: 1.5rem;
+    /* Add space before button */
+}
+
+/* --- Enrollment Grid --- */
+.enrollmentGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    /* Adjust min width */
+    gap: 1.75rem;
+    margin-bottom: 2.5rem;
+}
+
+/* --- Enrollment Card --- */
+/* Similar structure to CourseCard, but maybe slightly different emphasis */
+.enrollmentCard {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--background-color-secondary);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.enrollmentCard:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    /* 16:9 Aspect Ratio */
+    background-color: var(--border-color-light);
+    overflow: hidden;
+}
+
+.image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.enrollmentCard:hover .image {
+    transform: scale(1.05);
+}
+
+.content {
+    padding: 1rem 1.2rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.courseTitleLink {
+    text-decoration: none;
+    color: inherit;
+}
+
+.courseTitle {
+    font-size: 1.15em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.6rem;
+    color: var(--text-color-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 2.6em;
+    transition: color 0.2s;
+}
+
+.courseTitleLink:hover .courseTitle {
+    color: var(--accent-color);
+}
+
+.enrollmentMeta {
+    margin-bottom: 1rem;
+    font-size: 0.9em;
+    color: var(--text-color-secondary);
+    flex-grow: 1;
+    /* Push actions down */
+}
+
+.metaItem {
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.metaLabel {
+    font-weight: 500;
+    color: var(--text-color-primary);
+    flex-shrink: 0;
+    /* Prevent label shrinking */
+}
+
+/* Status badge reuse */
+.statusBadge {
+    composes: statusBadge from '../components/Course/CourseCard.module.css';
+    margin-left: 0.2em;
+    /* Add slight space */
+}
+
+.active {
+    composes: active from '../components/Course/CourseCard.module.css';
+}
+
+.completed {
+    background-color: var(--success-color);
+    /* Use success color for completed */
+}
+
+.cancelled {
+    background-color: var(--text-color-secondary);
+    /* Gray for cancelled */
+}
+
+
+.actions {
+    margin-top: auto;
+    /* Push to bottom */
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border-color-light);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    /* Align buttons to the right */
+}

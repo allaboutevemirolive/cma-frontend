@@ -3,24 +3,24 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 // API and Types
 import { listCourses, deleteCourse } from '../services/api';
-import { Course, PaginatedResponse } from '../types';
+import { Course, PaginatedResponse } from '../types'; // Import User type
 
 // Custom Hooks
 import { useAuth } from '../hooks/useAuth';
 
 // Reusable UI Components
-import CourseCard from '../components/Course/CourseCard';
+import CourseCard from '../components/Course/CourseCard'; // Ensure path is correct
 import Button from '../components/Common/Button/Button';
 import Spinner from '../components/Common/Spinner/Spinner';
 import Modal from '../components/Common/Modal/Modal';
-import CourseForm from '../components/Course/CourseForm';
-import Input from '../components/Common/Input/Input';
+import CourseForm from '../components/Course/CourseForm'; // Ensure path is correct
+import Input from '../components/Common/Input/Input'; // Ensure path is correct
 
 // Icons
 import { PlusCircle, AlertCircle, Inbox, SearchX } from 'lucide-react';
 
 // Page specific styles
-import styles from './CourseListPage.module.css';
+import styles from './CourseListPage.module.css'; // Ensure path is correct
 
 const ITEMS_PER_PAGE = 9;
 
@@ -31,19 +31,23 @@ const CourseListPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false); // State for edit modal
+    const [courseToEdit, setCourseToEdit] = useState<Course | null>(null); // State for course being edited
     const [page, setPage] = useState<number>(1);
     const pageSize = ITEMS_PER_PAGE;
 
-    // --- Callbacks (fetchCourses, handleSearchChange, etc. remain the same) ---
     const fetchCourses = useCallback(async (currentPage: number, search: string, size: number) => {
         console.log(`Fetching courses: page=${currentPage}, search='${search}', size=${size}`);
         setIsLoadingCourses(true);
         setError(null);
         try {
-            const params = {
+            // Determine if filtering by instructor is needed
+            const params: ListCoursesParams = {
                 page: currentPage,
                 search: search || undefined,
                 page_size: size,
+                // Example: Add instructor_id filter if needed for a specific view
+                // instructor_id: user?.profile.role === 'instructor' ? user.id : undefined,
             };
             const data = await listCourses(params);
             setCoursesResponse(data);
@@ -54,62 +58,105 @@ const CourseListPage: React.FC = () => {
         } finally {
             setIsLoadingCourses(false);
         }
-    }, []);
+    }, []); // Removed user from dependencies here, filter logic can be separate if needed
 
     useEffect(() => {
+        // Debounce search or fetch immediately
         const debounceTimer = setTimeout(() => {
-            fetchCourses(page, searchTerm, pageSize);
-        }, 300);
+             fetchCourses(page, searchTerm, pageSize);
+        }, 300); // 300ms debounce
         return () => clearTimeout(debounceTimer);
-    }, [fetchCourses, page, searchTerm, pageSize]);
+    }, [fetchCourses, page, searchTerm, pageSize]); // Re-fetch when page, search term changes
+
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
-        setPage(1);
+        setPage(1); // Reset to first page on new search
     };
 
-    const handleCreateSuccess = () => {
+    const handleCreateSuccess = (newCourse: Course) => {
         setIsCreateModalOpen(false);
-        setSearchTerm('');
-        setPage(1);
-        fetchCourses(1, '', pageSize);
+        // Optionally, instead of refetching, add the new course to the start of the list
+        // This provides faster UI feedback but might not reflect correct pagination/ordering
+        // setCoursesResponse(prev => ({
+        //     ...prev!,
+        //     count: prev!.count + 1,
+        //     results: [newCourse, ...prev!.results.slice(0, pageSize -1)]
+        // }));
+        // Recommended: Refetch to ensure consistency
+        fetchCourses(1, '', pageSize); // Refetch page 1 without search
+        setPage(1); // Explicitly set page to 1
+        setSearchTerm(''); // Clear search term
+        alert(`Course "${newCourse.title}" created successfully!`);
     };
 
-    const handleDeleteCourse = async (courseId: number) => {
-        if (window.confirm(`Are you sure you want to delete this course? This action cannot be undone.`)) {
+    const handleEditSuccess = (updatedCourse: Course) => {
+         setIsEditModalOpen(false);
+         setCourseToEdit(null);
+         // Update the course in the current list for immediate feedback
+         setCoursesResponse(prev => {
+             if (!prev) return null;
+             return {
+                 ...prev,
+                 results: prev.results.map(c => c.id === updatedCourse.id ? updatedCourse : c)
+             };
+         });
+         alert(`Course "${updatedCourse.title}" updated successfully!`);
+         // Optionally refetch if complex sorting/filtering might change position
+         // fetchCourses(page, searchTerm, pageSize);
+    }
+
+    const handleDeleteCourse = async (courseId: number, courseTitle: string) => {
+        // Added courseTitle for better confirmation message
+        if (window.confirm(`Are you sure you want to delete the course "${courseTitle}"? This action cannot be undone.`)) {
+             setIsLoadingCourses(true); // Indicate loading during delete
             try {
-                await deleteCourse(courseId);
+                await deleteCourse(String(courseId)); // Ensure ID is string if API expects that
                 alert('Course deleted successfully.');
-                if (coursesResponse?.results.length === 1 && page > 1) {
-                    setPage(page - 1);
-                } else {
-                    fetchCourses(page, searchTerm, pageSize);
-                }
+                // Refetch the current page after deletion
+                // Adjust page number if the deleted item was the last one on a page > 1
+                 if (coursesResponse?.results.length === 1 && page > 1) {
+                     const newPage = page - 1;
+                     setPage(newPage); // This will trigger useEffect to fetch
+                 } else {
+                    fetchCourses(page, searchTerm, pageSize); // Refetch current page
+                 }
+
             } catch (err: any) {
                 const errorMsg = err.response?.data?.detail || err.message || 'Unknown error';
                 alert(`Failed to delete course: ${errorMsg}`);
                 console.error("Delete course error:", err.response || err);
+                 setIsLoadingCourses(false); // Stop loading on error
             }
+             // Loading stops automatically on successful fetch in useEffect
         }
-    }
+    };
+
+    // Handler to open the edit modal
+    const handleEditCourse = (course: Course) => {
+        setCourseToEdit(course);
+        setIsEditModalOpen(true);
+    };
+
 
     const handlePageChange = (newPage: number) => {
         const totalPages = coursesResponse ? Math.ceil(coursesResponse.count / pageSize) : 1;
         if (newPage > 0 && newPage <= totalPages) {
-            setPage(newPage);
+            setPage(newPage); // This will trigger the useEffect to refetch
         }
-    }
+    };
 
-    // --- Calculated states (remain the same) ---
-    const canCreateCourse = !isAuthLoading && !!user;
+    // --- Calculated states ---
+    // Determine if the user has instructor/admin role
+    const canManageCourses = !isAuthLoading && (user?.profile?.role === 'instructor' || user?.profile?.role === 'admin');
     const totalPages = coursesResponse ? Math.ceil(coursesResponse.count / pageSize) : 0;
     const hasCourses = coursesResponse && coursesResponse.results.length > 0;
     const showPagination = hasCourses && totalPages > 1;
-    const isInitiallyLoading = isLoadingCourses || isAuthLoading;
+    const isInitiallyLoading = (isLoadingCourses && !coursesResponse) || isAuthLoading; // True only on first load or auth check
     const NoResultsIcon = searchTerm ? SearchX : Inbox;
     const noResultsMessage = searchTerm
         ? `No courses found matching "${searchTerm}". Try a different search.`
-        : 'There are currently no courses to display. Why not create one?';
+        : 'There are currently no courses to display.';
 
 
     return (
@@ -117,27 +164,28 @@ const CourseListPage: React.FC = () => {
             <div className={styles.controls}>
                 <h1 className={styles.title}>Courses</h1>
                 <div className={styles.actionsContainer}>
-                    {/* Apply the new wrapper class to the Input */}
                     <div className={styles.searchControl}>
                         <Input
                             type="search"
-                            placeholder="Search by title..."
+                            placeholder="Search by title, description..." // Update placeholder
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            aria-label="Search courses by title"
-                            // Remove margin-bottom style from Input component's internal group
-                            className={styles.searchInput} // Keep if needed for width/flex overrides
+                            aria-label="Search courses"
+                            disabled={isInitiallyLoading} // Disable while loading initial data
                         />
                     </div>
-                    <Button
-                        variant="primary"
-                        onClick={() => setIsCreateModalOpen(true)}
-                        disabled={!canCreateCourse || isAuthLoading}
-                        title={!canCreateCourse ? "Login to create courses" : "Create a new course"}
-                    >
-                        <PlusCircle size={18} style={{ marginRight: '0.5em' }} />
-                        <span>Create Course</span>
-                    </Button>
+                    {/* Show Create button only for instructors/admins */}
+                    {canManageCourses && (
+                        <Button
+                            variant="primary"
+                            onClick={() => setIsCreateModalOpen(true)}
+                            disabled={isAuthLoading} // Disable only while auth is loading
+                            title="Create a new course"
+                        >
+                            <PlusCircle size={18} style={{ marginRight: '0.5em' }} />
+                            <span>Create Course</span>
+                        </Button>
+                     )}
                 </div>
             </div>
 
@@ -150,10 +198,12 @@ const CourseListPage: React.FC = () => {
             )}
 
             {/* Error State */}
-            {error && !isLoadingCourses && (
+            {error && !isInitiallyLoading && ( // Show error only after initial load attempt
                 <div className={styles.errorMessage} role="alert">
                     <AlertCircle size={20} aria-hidden="true" />
                     <span>{error}</span>
+                     {/* Optional: Add a retry button */}
+                     <Button onClick={() => fetchCourses(page, searchTerm, pageSize)} variant="secondary" size="small" style={{marginLeft: '1rem'}}>Retry</Button>
                 </div>
             )}
 
@@ -164,13 +214,13 @@ const CourseListPage: React.FC = () => {
                         <div className={styles.noResultsContainer}>
                             <NoResultsIcon className={styles.noResultsIcon} aria-hidden="true" />
                             <p className={styles.noResultsText}>{noResultsMessage}</p>
-                            {!searchTerm && canCreateCourse && (
+                            {/* Encourage creation if no results and user can manage */}
+                            {!searchTerm && canManageCourses && (
                                  <Button
                                     style={{marginTop: '1rem'}}
                                     variant="primary"
                                     onClick={() => setIsCreateModalOpen(true)}
-                                    disabled={!canCreateCourse || isAuthLoading}
-                                    title="Create a new course"
+                                    disabled={isAuthLoading}
                                 >
                                     <PlusCircle size={18} style={{ marginRight: '0.5em' }} />
                                     Create First Course
@@ -178,15 +228,20 @@ const CourseListPage: React.FC = () => {
                             )}
                         </div>
                     ) : (
-                        <div className={styles.courseGrid}>
-                            {coursesResponse.results.map((course) => (
-                                <CourseCard
-                                    key={course.id}
-                                    course={course}
-                                    onDelete={handleDeleteCourse}
-                                />
-                            ))}
-                        </div>
+                         <>
+                            {/* Show loading indicator overlay during subsequent fetches (e.g., pagination, delete) */}
+                            {isLoadingCourses && coursesResponse && <div className={styles.loadingContainer}><Spinner /><span className={styles.loadingText}>Updating...</span></div>}
+                            <div className={styles.courseGrid} style={{ opacity: isLoadingCourses && coursesResponse ? 0.6 : 1 }}> {/* Fade grid during update */}
+                                {coursesResponse.results.map((course) => (
+                                    <CourseCard
+                                        key={course.id}
+                                        course={course}
+                                        onDelete={handleDeleteCourse} // Pass handler
+                                        onEdit={handleEditCourse}   // Pass handler
+                                    />
+                                ))}
+                            </div>
+                        </>
                     )}
                 </>
             )}
@@ -203,7 +258,7 @@ const CourseListPage: React.FC = () => {
                         Previous
                     </Button>
                     <span className={styles.pageInfo} aria-live="polite">
-                        Page {page} of {totalPages}
+                        Page {page} of {totalPages} ({coursesResponse.count} total courses)
                     </span>
                     <Button
                         onClick={() => handlePageChange(page + 1)}
@@ -217,21 +272,48 @@ const CourseListPage: React.FC = () => {
             )}
 
             {/* Create Course Modal */}
-            {canCreateCourse && (
+            {canManageCourses && (
                 <Modal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
                     title="Create New Course"
                 >
                     <CourseForm
-                        user={user}
+                        user={user} // Pass the logged-in user (required for instructor_id)
                         onSuccess={handleCreateSuccess}
                         onCancel={() => setIsCreateModalOpen(false)}
                     />
                 </Modal>
             )}
+
+             {/* Edit Course Modal */}
+             {canManageCourses && courseToEdit && (
+                 <Modal
+                    isOpen={isEditModalOpen}
+                    onClose={() => { setIsEditModalOpen(false); setCourseToEdit(null); }}
+                    title={`Edit Course: ${courseToEdit.title}`}
+                 >
+                     <CourseForm
+                        initialValues={courseToEdit} // Prefill with selected course data
+                        user={user} // Still pass user, though instructor_id comes from initialValues
+                        onSuccess={handleEditSuccess}
+                        onCancel={() => { setIsEditModalOpen(false); setCourseToEdit(null); }}
+                     />
+                 </Modal>
+             )}
+
         </div>
     );
 };
+
+// Define interface for ListCoursesParams if not globally defined
+interface ListCoursesParams {
+    search?: string;
+    status?: 'active' | 'inactive' | 'draft';
+    instructor_id?: number;
+    ordering?: string;
+    page?: number;
+    page_size?: number;
+}
 
 export default CourseListPage;
