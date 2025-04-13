@@ -5,7 +5,8 @@ import { useAuth } from '../../hooks/useAuth';
 import Button from '../Common/Button/Button';
 import styles from './Header.module.css';
 import viteLogo from '/vite.svg'; // Use your logo
-import { LogIn, LogOut, UserCircle } from 'lucide-react'; // Add icons
+// Updated icons import
+import { LogIn, LogOut, UserCircle } from 'lucide-react';
 
 const Header: React.FC = () => {
     const { isAuthenticated, logout, user } = useAuth();
@@ -33,44 +34,51 @@ const Header: React.FC = () => {
                      {/* Links for Students */}
                      {isAuthenticated && userRole === 'student' && (
                          <>
-                             {/* TODO: Uncomment when MyEnrollmentsPage is created */}
-                             {/* <NavLink
+                             {/* --- ADDED: My Enrollments Link --- */}
+                             <NavLink
                                  to="/my-enrollments"
                                  className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink}
                                   title="View your enrolled courses"
                              >
-                                 My Courses
-                             </NavLink> */}
+                                 My Enrollments
+                             </NavLink>
                          </>
                      )}
 
-                     {/* Links for Instructors */}
-                     {isAuthenticated && userRole === 'instructor' && (
+                     {/* Links for Instructors / Admins */}
+                     {isAuthenticated && (userRole === 'instructor' || userRole === 'admin') && (
                           <>
-                              {/* TODO: Uncomment when InstructorDashboard is created */}
-                              {/* <NavLink
-                                  to="/instructor/dashboard"
+                              {/* --- ADDED: Quizzes Link (placeholder) --- */}
+                              {/* This might link to a general quiz management page or specific course quizzes depending on design */}
+                              <NavLink
+                                  to="/quizzes" // Placeholder route - adjust as needed
                                   className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink}
-                                  title="Manage your courses and quizzes"
+                                  title="Manage Quizzes" // Adjust title if needed
                               >
-                                  Dashboard
-                              </NavLink> */}
+                                  Quizzes
+                              </NavLink>
+
+                              {/* --- ADDED: Submissions Link (placeholder) --- */}
+                              {/* This might link to a list of submissions needing grading or all submissions */}
+                              <NavLink
+                                  to="/submissions" // Placeholder route - adjust as needed
+                                  className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink}
+                                  title="View Submissions" // Adjust title if needed
+                              >
+                                  Submissions
+                              </NavLink>
+
+                              {/* TODO: Add other instructor/admin links (e.g., Dashboard) */}
+                              {/* <NavLink to="/instructor/dashboard" ... > Dashboard </NavLink> */}
                           </>
                      )}
 
-                    {/* Links for Admins */}
-                     {isAuthenticated && userRole === 'admin' && (
+                    {/* Links for Admins Only (Example) */}
+                     {/* {isAuthenticated && userRole === 'admin' && (
                           <>
-                              {/* TODO: Uncomment when AdminDashboard is created */}
-                              {/* <NavLink
-                                  to="/admin/dashboard"
-                                  className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink}
-                                   title="Admin Management Area"
-                              >
-                                  Admin Panel
-                              </NavLink> */}
+                              <NavLink to="/admin/users" ... > Users </NavLink>
                           </>
-                     )}
+                     )} */}
 
 
                     {/* Auth actions */}
