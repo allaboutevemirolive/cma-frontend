@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 
 // API and Types
 import { getCourseDetails, deleteCourse, enrollUser } from '../services/api';
-import { Course, User } from '../types'; // User type needs profile and is_staff
+import { Course } from '../types'; // User type needs profile and is_staff
 
 // Custom Hooks
 import { useAuth } from '../hooks/useAuth';
