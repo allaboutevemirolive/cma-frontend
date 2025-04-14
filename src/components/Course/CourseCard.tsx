@@ -94,28 +94,30 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
                 {/* Meta Information Section */}
                 <div className={styles.metaInfo}>
                     {/* Instructor Info */}
-                    <p className={styles.metaItem} title={`Instructor: ${course.instructor?.username || 'N/A'}`}>
-                        <UserIcon size={14} aria-hidden="true" />
+                    <div className={styles.metaItem} title={`Instructor: ${course.instructor?.username || 'N/A'}`}>
+                        <UserIcon size={14} aria-hidden="true" /> {/* Use specific name */}
                         <span className={styles.metaLabel}>Instructor:</span>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {/* Span for potential truncation */}
+                        <span>
                             {course.instructor?.username || 'N/A'}
                         </span>
-                    </p>
+                    </div>
                     {/* Price Info */}
-                    <p className={styles.metaItem} title={`Price: $${parseFloat(course.price).toFixed(2)}`}>
+                    <div className={styles.metaItem} title={`Price: $${parseFloat(course.price).toFixed(2)}`}>
                         <DollarSign size={14} aria-hidden="true" />
                         <span className={styles.metaLabel}>Price:</span>
                         <span className={styles.price}>${parseFloat(course.price).toFixed(2)}</span>
-                    </p>
+                    </div>
                     {/* Status Info */}
-                    <p className={styles.metaItem} title={`Status: ${course.status}`}>
+                    <div className={styles.metaItem} title={`Status: ${course.status}`}>
                         <Activity size={14} aria-hidden="true" />
                         <span className={styles.metaLabel}>Status:</span>
                         {/* Dynamically apply status badge style based on course.status */}
+                        {/* Added fallback || '' for safety */}
                         <span className={`${styles.statusBadge} ${styles[course.status] || ''}`}>
                             {course.status}
                         </span>
-                    </p>
+                    </div>
                 </div>
 
                 {/* Action Buttons Area */}
@@ -130,10 +132,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onDelete }) => {
                             aria-label={`Delete course ${course.title}`} // Accessibility label
                         >
                             <Trash2 size={14} aria-hidden="true" /> {/* Optional: Delete icon */}
-                            {/* You can add text like "Delete" here if preferred */}
+                            {/* Keeping button icon-only for cleaner look */}
                         </Button>
                     )}
                     {/* Add other actions like "Edit" here if needed on the card itself, checking permissions */}
+                    {/* Example:
+                    {canEdit && ( // Assuming 'canEdit' logic exists
+                        <Link to={`/courses/${course.id}/edit`} onClick={(e) => e.stopPropagation()}>
+                             <Button variant="secondary" size="small">Edit</Button>
+                        </Link>
+                    )}
+                    */}
                 </div>
             </div>
         </div>

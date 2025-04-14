@@ -1,102 +1,140 @@
 /* src/components/Course/CourseCard.module.css */
+
 .card {
+    background-color: var(--background-color-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
+    /* Use consistent radius */
     overflow: hidden;
-    background-color: var(--background-color-secondary);
+    /* Clip child elements like image */
     box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    /* Start with subtle shadow */
+    transition: box-shadow 0.25s ease-in-out, transform 0.25s ease-in-out;
     display: flex;
     flex-direction: column;
     height: 100%;
-    /* Make card fill grid cell height */
+    /* Ensure cards fill grid cell height */
 }
 
 .card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-    /* Subtle lift effect */
+    /* Slightly larger shadow on hover */
+    transform: translateY(-4px);
+    /* Slightly more lift */
 }
 
+/* --- Image --- */
 .imageContainer {
     position: relative;
+    /* For absolute positioning of the image */
     width: 100%;
     padding-top: 56.25%;
     /* 16:9 Aspect Ratio */
     background-color: var(--border-color-light);
+    /* Placeholder background */
     overflow: hidden;
+    /* Ensure image zoom doesn't overflow card */
 }
 
 .image {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
+    /* Same as top/left/right/bottom: 0 */
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* Scale while maintaining aspect ratio, cropping */
     display: block;
+    /* Remove extra space below image */
     transition: transform 0.3s ease;
 }
 
 .card:hover .image {
-    transform: scale(1.05);
-    /* Slight zoom on hover */
+    transform: scale(1.04);
+    /* Subtle zoom on hover */
 }
 
+/* --- Content Area --- */
 .content {
-    padding: 1rem 1.2rem;
-    /* Adjusted padding */
+    padding: 1rem 1.25rem 1.25rem;
+    /* Consistent padding, slightly more vertical */
     flex-grow: 1;
+    /* Allow content to fill remaining space */
     display: flex;
     flex-direction: column;
+    gap: 0.75rem;
+    /* Space between title, meta, actions */
 }
 
+/* --- Title --- */
 .titleLink {
     text-decoration: none;
     color: inherit;
-    /* Inherit text color */
+    /* Don't force link color */
 }
 
 .title {
-    font-size: 1.15em;
-    /* Adjusted size */
+    font-size: 1.1em;
+    /* Slightly smaller for cleaner look */
     font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 0.6rem;
+    line-height: 1.4;
+    /* Adjust line height */
+    margin: 0;
+    /* Remove default heading margin */
     color: var(--text-color-primary);
+    /* Truncate long titles to 2 lines */
     display: -webkit-box;
-    /* Truncate long titles */
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 2.6em;
-    /* Reserve space for 2 lines */
-    transition: color 0.2s;
+    min-height: calc(1.4em * 2);
+    /* Reserve space for 2 lines based on line-height */
+    transition: color 0.2s ease;
 }
 
 .titleLink:hover .title {
     color: var(--accent-color);
+    /* Change color on hover */
 }
 
+/* --- Meta Info --- */
 .metaInfo {
-    margin-bottom: 1rem;
-    font-size: 0.9em;
+    /* Removed margin-bottom, now handled by parent gap */
+    font-size: 0.875em;
+    /* Slightly smaller meta text */
     color: var(--text-color-secondary);
     flex-grow: 1;
-    /* Push actions down */
+    /* Push actions down by taking available space */
+    display: flex;
+    /* Added flex container for meta items */
+    flex-direction: column;
+    /* Stack meta items vertically */
+    gap: 0.4rem;
+    /* Space between meta items */
 }
 
 .metaItem {
-    margin-bottom: 0.3rem;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    /* Vertically align icon and text */
+    gap: 0.5rem;
+    /* Space between icon and text */
+    /* Remove individual margin-bottom */
 }
 
 .metaLabel {
     font-weight: 500;
     color: var(--text-color-primary);
+    flex-shrink: 0;
+    /* Prevent label from shrinking */
+}
+
+/* Ensure long instructor names truncate */
+.metaItem>span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .price {
@@ -104,38 +142,57 @@
     color: var(--text-color-primary);
 }
 
+/* Status Badge (Reuses styles but refine) */
 .statusBadge {
     display: inline-block;
-    padding: 0.25em 0.6em;
+    padding: 0.2em 0.6em;
+    /* Adjust padding */
     border-radius: 4px;
     font-size: 0.8em;
-    /* Smaller badge */
     font-weight: 600;
+    line-height: 1.4;
+    /* Match title line-height */
     text-transform: capitalize;
     color: white;
-    line-height: 1.2;
+    /* Default text color */
 }
 
+/* Badge Colors (Ensure high contrast) */
 .statusBadge.active {
     background-color: var(--success-color);
+    /* Consider text color if bg is light in some themes */
 }
 
 .statusBadge.inactive {
     background-color: var(--text-color-secondary);
+    /* Gray for inactive */
 }
 
 .statusBadge.draft {
     background-color: var(--warning-color);
     color: var(--warning-text-color);
+    /* Ensure contrast */
 }
 
+/* --- Actions --- */
 .actions {
-    margin-top: auto;
-    /* Push to bottom */
-    padding-top: 0.5rem;
+    /* margin-top: auto; -- Removed, flex-grow on metaInfo handles this */
+    padding-top: 0.75rem;
     /* Space above actions */
     border-top: 1px solid var(--border-color-light);
+    /* Subtle separator */
     display: flex;
     gap: 0.5rem;
     justify-content: flex-end;
+    /* Align actions to the right */
+    align-items: center;
+    /* Align buttons vertically */
+}
+
+/* Style adjustments for dark mode if necessary */
+@media (prefers-color-scheme: dark) {
+    .statusBadge.draft {
+        /* Ensure contrast on dark mode if needed */
+        /* color: #111; */
+    }
 }

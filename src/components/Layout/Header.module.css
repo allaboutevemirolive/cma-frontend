@@ -1,26 +1,41 @@
 /* src/components/Layout/Header.module.css */
 .header {
-    background-color: var(--header-bg);
-    color: var(--header-text);
-    padding: 0.75rem 0;
-    /* Slightly adjusted padding */
+    background-color: var(--background-color);
+    /* Use main background for potentially cleaner look */
+    color: var(--text-color-primary);
+    padding: 0.8rem 0;
+    /* Slightly more vertical padding */
     box-shadow: var(--shadow-sm);
     position: sticky;
-    /* Make header sticky */
     top: 0;
     z-index: 50;
-    /* Ensure it's above content but below modals */
-    border-bottom: 1px solid var(--border-color-light);
+    border-bottom: 1px solid var(--border-color);
+    /* Use standard border */
+    backdrop-filter: blur(5px);
+    /* Optional: Add a subtle blur effect */
+    background-color: color-mix(in srgb, var(--background-color) 90%, transparent);
+    /* Slight transparency */
 }
+
+@media (prefers-color-scheme: dark) {
+    .header {
+        background-color: color-mix(in srgb, var(--background-color) 92%, #000 8%);
+        /* Slightly darker transparent bg */
+        border-bottom-color: var(--border-color);
+    }
+}
+
 
 .container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 1rem;
-    /* Match root padding */
+    padding: 0 1.5rem;
+    /* More horizontal padding */
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 50px;
+    /* Ensure consistent height */
 }
 
 .logoLink {
@@ -28,92 +43,129 @@
     align-items: center;
     text-decoration: none;
     color: inherit;
-    gap: 0.6em;
-    /* Gap between logo and text */
+    gap: 0.75em;
+    /* Slightly more gap */
+    transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+    opacity: 0.85;
+    /* Subtle hover effect */
 }
 
 .logo {
-    height: 2.2em;
-    /* Adjusted size */
+    height: 2em;
+    /* Slightly smaller logo */
     vertical-align: middle;
 }
 
 .appName {
-    font-size: 1.25em;
-    /* Adjusted size */
+    font-size: 1.15em;
+    /* Slightly adjusted */
     font-weight: 600;
-    /* Slightly bolder */
     color: var(--text-color-primary);
-    /* Use primary text color */
 }
 
+/* Main Navigation */
 .nav {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
-    /* Adjusted gap */
+    gap: 0.5rem;
+    /* Initial gap for main links */
 }
 
 .navLink {
     color: var(--text-color-secondary);
-    /* Use secondary text color */
     text-decoration: none;
-    padding: 0.4em 0.2em;
-    /* Reduced padding for cleaner look */
+    padding: 0.5em 0.8em;
+    /* More padding for click area */
+    border-radius: var(--border-radius);
+    /* Soften edges */
     position: relative;
-    transition: color 0.2s;
+    transition: color 0.2s ease, background-color 0.2s ease;
     font-weight: 500;
+    font-size: 0.95em;
 }
 
-.navLink:hover {
+/* Subtle background on hover */
+.navLink:hover:not(.activeLink) {
     color: var(--text-color-primary);
+    background-color: color-mix(in srgb, var(--accent-color) 8%, transparent);
 }
 
 .navLink.activeLink {
     color: var(--accent-color);
     font-weight: 600;
+    /* Optional: Keep subtle background even when active */
+    /* background-color: color-mix(in srgb, var(--accent-color) 5%, transparent); */
 }
 
-/* Underline effect for active link */
+/* Refined Active Link Underline */
 .navLink.activeLink::after {
     content: '';
     position: absolute;
-    bottom: -2px;
-    /* Position below text */
-    left: 0;
-    width: 100%;
-    height: 2px;
+    bottom: -5px;
+    /* Position slightly lower */
+    left: 0.8em;
+    /* Indent slightly */
+    right: 0.8em;
+    /* Indent slightly */
+    height: 3px;
+    /* Thicker underline */
     background-color: var(--accent-color);
+    border-radius: 1.5px;
+    /* Rounded ends */
+    /* Add transition for smooth appearance/disappearance if needed */
+    /* transition: transform 0.2s ease-out, opacity 0.2s ease-out; */
+    /* transform: scaleX(1); */
+    /* opacity: 1; */
+}
+
+/* User Actions Area (Welcome message + Logout Button) */
+.userActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* Consistent gap */
+    margin-left: 1.5rem;
+    /* Space between nav links and user actions */
 }
 
 .userInfo {
     font-size: 0.9em;
     color: var(--text-color-secondary);
-    margin-right: 0.5rem;
-    /* Space before logout button */
+    white-space: nowrap;
+    /* Prevent wrapping */
+    /* Removed margin-right, handled by gap */
 }
 
-/*
- * REMOVED: Cannot use composes with complex selector like ".nav button"
- * Styling is handled by passing props to the Button component in Header.tsx
-*/
-/*
-.nav button {
-    composes: small from '../Common/Button/Button.module.css';
+/* Ensure button styles are applied correctly (should be handled by Button component props) */
+.logoutButton {
+    /* Styles are applied via Button component variant/size props */
+    /* Example if direct styling was needed: */
+    /* padding: 0.3em 0.8em !important; */
+    /* font-size: 0.85em !important; */
 }
-*/
 
-/* Adjust dark mode text colors if needed */
-@media (prefers-color-scheme: dark) {
+
+/* Optional: Responsive adjustments (e.g., hide app name text on very small screens) */
+@media (max-width: 640px) {
+    .container {
+        padding: 0 1rem;
+        /* Reduce padding */
+    }
+
     .appName {
-        color: var(--text-color-primary);
+        /* display: none; Hide text if needed */
     }
 
-    .navLink {
-        color: var(--text-color-secondary);
+    .nav {
+        gap: 0.2rem;
+        /* Reduce gap */
     }
 
-    .navLink:hover {
-        color: var(--text-color-primary);
+    .userActions {
+        margin-left: 0.8rem;
+        gap: 0.5rem;
     }
 }
