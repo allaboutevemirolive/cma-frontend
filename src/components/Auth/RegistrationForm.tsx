@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import Button from '../Common/Button/Button';
 import Input from '../Common/Input/Input';
 import { RegistrationPayload } from '../../types';
-import styles from './RegistrationForm.module.css'; // Create this CSS file
+import styles from './RegistrationForm.module.css'; 
 
 interface RegistrationFormProps {
     onSubmit: (values: RegistrationPayload) => Promise<void>;
@@ -35,27 +35,27 @@ const RegistrationSchema = Yup.object().shape({
 
 const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSubmit, isLoading }) => {
     return (
-        <Formik<RegistrationPayload> // Specify the type here
+        <Formik<RegistrationPayload> 
             initialValues={{
                 username: '',
                 email: '',
                 password: '',
                 password2: '',
-                role: 'student', // Default role
+                role: 'student', 
                 first_name: '',
                 last_name: '',
             }}
             validationSchema={RegistrationSchema}
             onSubmit={async (values, { setSubmitting }) => {
-                // We only need to pass the fields defined in RegistrationPayload to onSubmit
+
                 const payload: RegistrationPayload = {
                     username: values.username,
                     email: values.email,
                     password: values.password,
-                    password2: values.password2, // Send confirmation too
+                    password2: values.password2, 
                     role: values.role,
-                    first_name: values.first_name || undefined, // Send undefined if empty
-                    last_name: values.last_name || undefined,   // Send undefined if empty
+                    first_name: values.first_name || undefined, 
+                    last_name: values.last_name || undefined,   
                 };
                 await onSubmit(payload);
                 setSubmitting(false);

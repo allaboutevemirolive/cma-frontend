@@ -8,26 +8,26 @@ const NotFoundPage: React.FC = () => {
         <div style={{
             textAlign: 'center',
             padding: '4rem 1rem',
-            minHeight: '70vh', // Ensure it takes significant height
+            minHeight: '70vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            color: 'var(--text-color-secondary)', // Use theme color
-            flexGrow: 1 // Make it fill remaining space in #root
+            color: 'var(--text-color-secondary)',
+            flexGrow: 1
         }}>
             <h1 style={{
-                fontSize: 'clamp(4em, 15vw, 8em)', // Responsive font size
+                fontSize: 'clamp(4em, 15vw, 8em)',
                 margin: '0',
                 fontWeight: 'bold',
-                color: 'var(--border-color)' // Use a subtle theme color
+                color: 'var(--border-color)'
             }}>
                 404
             </h1>
             <h2 style={{
                 margin: '0.5rem 0 1rem 0',
                 fontWeight: '500',
-                color: 'var(--text-color-primary)' // Use theme color
+                color: 'var(--text-color-primary)'
             }}>
                 Page Not Found
             </h2>

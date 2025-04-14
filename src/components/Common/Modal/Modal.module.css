@@ -2,37 +2,37 @@
 .overlay {
     position: fixed;
     inset: 0;
-    /* Simpler way for top/left/right/bottom: 0 */
+
     background-color: rgba(0, 0, 0, 0.65);
-    /* Slightly darker overlay */
+
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     padding: 1rem;
     animation: fadeIn 0.2s ease-out forwards;
-    /* Ensure animation stays */
+
 }
 
 .modalContent {
     background-color: var(--background-color);
     color: var(--text-color-primary);
     padding: 0;
-    /* Remove padding, handle inside header/body */
+
     border-radius: 8px;
-    /* Slightly larger radius */
+
     box-shadow: var(--shadow-lg);
-    /* Use variable */
+
     max-width: 600px;
     width: 95%;
     max-height: 90vh;
     overflow: hidden;
-    /* Prevent content spill before internal scroll */
+
     display: flex;
     flex-direction: column;
     position: relative;
     animation: scaleUp 0.25s ease-out forwards;
-    /* Different animation */
+
 }
 
 .modalHeader {
@@ -41,15 +41,15 @@
     align-items: center;
     border-bottom: 1px solid var(--border-color-light);
     padding: 1rem 1.5rem;
-    /* Consistent padding */
+
     flex-shrink: 0;
-    /* Prevent header from shrinking */
+
 }
 
 .modalTitle {
     margin: 0;
     font-size: 1.3em;
-    /* Slightly adjusted */
+
     font-weight: 600;
 }
 
@@ -57,11 +57,11 @@
     background: none;
     border: none;
     font-size: 1.6rem;
-    /* Adjusted */
+
     line-height: 1;
     cursor: pointer;
     padding: 0.2rem;
-    /* Small padding for click area */
+
     color: var(--text-color-secondary);
     border-radius: 50%;
     width: 32px;
@@ -79,14 +79,13 @@
 
 .modalBody {
     padding: 1.5rem;
-    /* Padding for content */
+
     overflow-y: auto;
-    /* Scroll only the body */
+
     flex-grow: 1;
-    /* Allow body to take available space */
+
 }
 
-/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -109,7 +108,6 @@
     }
 }
 
-/* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
     .overlay {
         background-color: rgba(0, 0, 0, 0.75);
@@ -119,7 +117,6 @@
         border-bottom-color: var(--border-color);
     }
 
-    /* Use standard dark border */
     .closeButton:hover {
         background-color: var(--border-color);
     }

@@ -6,7 +6,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'danger';
     size?: 'small' | 'medium' | 'large';
     isLoading?: boolean;
-    className?: string; // Ensure className is accepted
+    className?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -15,15 +15,15 @@ const Button: React.FC<ButtonProps> = ({
     size = 'medium',
     isLoading = false,
     disabled,
-    className, // Destructure className
+    className,
     ...props
 }) => {
     const buttonClasses = [
         styles.button,
         styles[variant],
         styles[size],
-        isLoading ? styles.loading : '', // Add loading class if needed
-        className, // Include passed className
+        isLoading ? styles.loading : '',
+        className,
     ].filter(Boolean).join(' ');
 
     return (

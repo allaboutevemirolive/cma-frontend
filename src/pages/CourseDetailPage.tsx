@@ -2,58 +2,50 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
-// API and Types
 import { getCourseDetails, deleteCourse, enrollUser } from '../services/api';
-import { Course } from '../types'; // User type needs profile and is_staff
+import { Course } from '../types';
 
-// Custom Hooks
 import { useAuth } from '../hooks/useAuth';
 
-// Reusable UI Components
 import Spinner from '../components/Common/Spinner/Spinner';
 import Button from '../components/Common/Button/Button';
 import Modal from '../components/Common/Modal/Modal';
 import CourseForm from '../components/Course/CourseForm';
 
-// Icons
 import {
     ArrowLeft, User as UserIcon, Calendar, Tag, DollarSign, Edit, Trash2,
     AlertCircle, CheckCircle, PlusCircle, Info
 } from 'lucide-react';
 
-// Page specific styles
 import styles from './CourseDetailPage.module.css';
 
 const CourseDetailPage: React.FC = () => {
-    // --- Hooks ---
+
     const { courseId } = useParams<{ courseId: string }>();
     const navigate = useNavigate();
     const { user, isLoading: isAuthLoading } = useAuth();
 
-    // --- State ---
     const [course, setCourse] = useState<Course | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true); // Main page loading (fetch/delete)
-    const [error, setError] = useState<string | null>(null); // General page error
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-    const [isEnrolling, setIsEnrolling] = useState<boolean>(false); // Specific loading for enroll button
-    const [enrollError, setEnrollError] = useState<string | null>(null); // Specific error for enrollment
-    // MVP Limitation: Real enrollment status check requires backend support. Defaulting to false.
+    const [isEnrolling, setIsEnrolling] = useState<boolean>(false);
+    const [enrollError, setEnrollError] = useState<string | null>(null);
+
     const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState<boolean>(false);
 
-    // --- Derived State & RBAC ---
     const isValidCourseId = courseId && !isNaN(Number(courseId));
     const numericCourseId = isValidCourseId ? Number(courseId) : null;
 
     const canManageCourse = !isAuthLoading && user && course && (user.id === course.instructor?.id || user.is_staff === true);
     const isStudent = !isAuthLoading && user?.profile?.role === 'student';
-    // Can the student potentially enroll? (Must be active course)
+
     const canEnroll = isStudent && course?.status === 'active' && !isAlreadyEnrolled;
     const enrollmentDisabledReason =
         course?.status !== 'active' ? `Cannot enroll in ${course?.status} courses` :
-        isAlreadyEnrolled ? 'You are already enrolled' :
-        null; // No reason if enrollable
+            isAlreadyEnrolled ? 'You are already enrolled' :
+                null;
 
-    // --- Data Fetching ---
     const fetchCourse = useCallback(async () => {
         if (!numericCourseId) {
             setError('Invalid Course ID provided.');
@@ -62,11 +54,11 @@ const CourseDetailPage: React.FC = () => {
         }
         setIsLoading(true);
         setError(null);
-        setEnrollError(null); // Clear previous errors on refetch
+        setEnrollError(null);
         try {
             const data = await getCourseDetails(numericCourseId);
             setCourse(data);
-            // TODO: Replace placeholder with API call to check actual enrollment status
+
             setIsAlreadyEnrolled(false);
         } catch (err: any) {
             console.error("Fetch course detail error:", err.response || err);
@@ -74,7 +66,7 @@ const CourseDetailPage: React.FC = () => {
                 ? 'Course not found.'
                 : err.response?.data?.detail || err.message || 'Failed to fetch course details.';
             setError(errorMsg);
-            setCourse(null); // Ensure course is null on error
+            setCourse(null);
         } finally {
             setIsLoading(false);
         }
@@ -84,18 +76,17 @@ const CourseDetailPage: React.FC = () => {
         fetchCourse();
     }, [fetchCourse]);
 
-    // --- Action Handlers ---
     const handleEditSuccess = (updatedCourse: Course) => {
         setCourse(updatedCourse);
         setIsEditModalOpen(false);
-        // Consider a more subtle notification than alert later (e.g., toast)
+
         alert('Course updated successfully!');
     };
 
     const handleDelete = async () => {
         if (!numericCourseId || !canManageCourse || !course) return;
         if (window.confirm(`Are you sure you want to delete the course "${course.title}"? This action cannot be undone.`)) {
-            setIsLoading(true); // Use main loading state for delete
+            setIsLoading(true);
             setError(null);
             try {
                 await deleteCourse(numericCourseId);
@@ -103,9 +94,9 @@ const CourseDetailPage: React.FC = () => {
                 navigate('/courses');
             } catch (err: any) {
                 const errorMsg = err.response?.data?.detail || err.message || 'Failed to delete course.';
-                setError(errorMsg); // Show error on the page
+                setError(errorMsg);
                 console.error("Delete course error:", err.response || err);
-                setIsLoading(false); // Stop loading on error
+                setIsLoading(false);
             }
         }
     };
@@ -117,21 +108,20 @@ const CourseDetailPage: React.FC = () => {
         try {
             await enrollUser({ course_id: numericCourseId });
             alert("Successfully enrolled!");
-            setIsAlreadyEnrolled(true); // Update local state optimistically
-            // Optionally refetch data: await fetchCourse();
+            setIsAlreadyEnrolled(true);
+
         } catch (err: any) {
             const errorMsg = err.response?.data?.detail
                 || (Array.isArray(err.response?.data?.non_field_errors) && err.response?.data?.non_field_errors[0])
                 || err.message
                 || 'Failed to enroll.';
-            setEnrollError(errorMsg); // Show enrollment-specific error
+            setEnrollError(errorMsg);
             console.error("Enrollment error:", err.response || err);
         } finally {
             setIsEnrolling(false);
         }
     };
 
-    // --- Helper Functions ---
     const getImageUrl = (imagePath?: string | null): string => {
         const placeholderImage = '/vite.svg';
         if (!imagePath) return placeholderImage;
@@ -156,9 +146,7 @@ const CourseDetailPage: React.FC = () => {
         if (target.src !== placeholderImage) { target.src = placeholderImage; }
     }
 
-    // --- Render Logic ---
-
-    if (isLoading || isAuthLoading) { // Show loading if either auth or course data is loading
+    if (isLoading || isAuthLoading) {
         return (
             <div className={styles.center}>
                 <Spinner />
@@ -167,7 +155,6 @@ const CourseDetailPage: React.FC = () => {
         );
     }
 
-    // Show general error (fetch/delete) or if course is null after loading
     if (error || !course) {
         return (
             <div className={styles.errorContainer}>
@@ -184,7 +171,6 @@ const CourseDetailPage: React.FC = () => {
         );
     }
 
-    // --- Main Course Detail Render ---
     return (
         <>
             <div className={styles.detailContainer}>
@@ -192,11 +178,11 @@ const CourseDetailPage: React.FC = () => {
                     <ArrowLeft size={16} aria-hidden="true" /> Back to Courses
                 </Link>
 
-                {/* Header: Title & Action Buttons */}
+                {}
                 <div className={styles.header}>
                     <h1 className={styles.title}>{course.title}</h1>
                     <div className={styles.actionButtonsContainer}>
-                        {/* Manage Buttons */}
+                        {}
                         {canManageCourse && (
                             <>
                                 <Button
@@ -213,7 +199,7 @@ const CourseDetailPage: React.FC = () => {
                                 </Button>
                             </>
                         )}
-                        {/* Enroll Button */}
+                        {}
                         {isStudent && (
                             <Button
                                 variant={isAlreadyEnrolled ? "secondary" : "primary"} size="small" onClick={handleEnroll}
@@ -231,22 +217,22 @@ const CourseDetailPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Enrollment Error/Info Message Area */}
-                 {enrollError && (
+                {}
+                {enrollError && (
                     <p className={`${styles.errorMessage} ${styles.messageBox}`} role="alert">
                         <AlertCircle size={16} aria-hidden="true" />
                         <span>{enrollError}</span>
                     </p>
                 )}
-                 {enrollmentDisabledReason && !isAlreadyEnrolled && !enrollError && (
-                     <p className={`${styles.infoMessage} ${styles.messageBox}`} role="status">
-                         <Info size={16} aria-hidden="true" />
-                         <span>{enrollmentDisabledReason}</span>
-                     </p>
+                {enrollmentDisabledReason && !isAlreadyEnrolled && !enrollError && (
+                    <p className={`${styles.infoMessage} ${styles.messageBox}`} role="status">
+                        <Info size={16} aria-hidden="true" />
+                        <span>{enrollmentDisabledReason}</span>
+                    </p>
                 )}
 
-                {/* Course Image */}
-                <figure style={{ margin: 0 }}> {/* Use figure semantically */}
+                {}
+                <figure style={{ margin: 0 }}>
                     <img
                         src={getImageUrl(course.image)}
                         alt={`Promotional image for ${course.title}`}
@@ -254,10 +240,10 @@ const CourseDetailPage: React.FC = () => {
                         onError={handleImageError}
                         loading="lazy"
                     />
-                    {/* Optional: <figcaption>Image caption</figcaption> */}
+                    {}
                 </figure>
 
-                {/* Main Content: Description & Meta */}
+                {}
                 <div className={styles.content}>
                     <section aria-label="Course description">
                         <p className={styles.description}>{course.description}</p>
@@ -289,7 +275,7 @@ const CourseDetailPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Edit Modal (Conditional) */}
+            {}
             {canManageCourse && (
                 <Modal
                     isOpen={isEditModalOpen}
@@ -298,7 +284,7 @@ const CourseDetailPage: React.FC = () => {
                 >
                     <CourseForm
                         initialValues={course}
-                        user={user} // Pass instructor object if needed by form logic
+                        user={user}
                         onSuccess={handleEditSuccess}
                         onCancel={() => setIsEditModalOpen(false)}
                     />

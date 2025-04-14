@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import RegistrationForm from '../components/Auth/RegistrationForm';
-import { registerUser } from '../services/api'; // Import the API function
+import { registerUser } from '../services/api';
 import { RegistrationPayload } from '../types';
-import styles from './RegistrationPage.module.css'; // Create this CSS file
+import styles from './RegistrationPage.module.css';
 
 const RegistrationPage: React.FC = () => {
     const navigate = useNavigate();
@@ -15,24 +15,24 @@ const RegistrationPage: React.FC = () => {
         setError(null);
         setIsLoading(true);
         try {
-            // Don't need password2 for API call itself if backend uses password validation
+
             const { password2, ...apiPayload } = payload;
             await registerUser(apiPayload);
             alert('Registration successful! Please log in.');
-            navigate('/login'); // Redirect to login page after successful registration
+            navigate('/login');
         } catch (err: any) {
             let errorMessage = 'Registration failed. Please try again.';
             if (err.response && err.response.data) {
                 const apiErrors = err.response.data;
                 console.error("API Registration Error:", apiErrors);
-                // More detailed error handling
+
                 if (typeof apiErrors === 'object') {
                     if (apiErrors.detail) {
                         errorMessage = apiErrors.detail;
                     } else if (apiErrors.non_field_errors) {
                         errorMessage = Array.isArray(apiErrors.non_field_errors) ? apiErrors.non_field_errors.join(' ') : apiErrors.non_field_errors;
                     } else {
-                        // Combine field-specific errors
+
                         const fieldErrors = Object.entries(apiErrors)
                             .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
                             .join('; ');

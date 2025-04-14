@@ -8,82 +8,74 @@ import React, {
     ReactNode,
 } from 'react';
 import { tokenStorage } from '../utils/tokenStorage';
-// Import the API functions needed
 import {
     login as apiLogin,
     refreshToken as apiRefreshToken,
-    getCurrentUser // Import the function to get user details
+    getCurrentUser 
 } from '../services/api';
-import { User } from '../types'; // Import the User type
+import { User } from '../types';
 
-// Define the shape of the context value
 interface AuthContextType {
     isAuthenticated: boolean;
-    user: User | null; // Store the fetched user object
-    isLoading: boolean; // Indicates if auth state is being checked
+    user: User | null; 
+    isLoading: boolean; 
     login: (credentials: { username: string; password: string }) => Promise<void>;
     logout: () => void;
-    checkAuth: () => Promise<void>; // Function to check auth status on initial load or refresh
+    checkAuth: () => Promise<void>; 
 }
 
-// Create the context with an initial undefined value
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Define props for the provider component
 interface AuthProviderProps {
     children: ReactNode;
 }
 
-// AuthProvider component manages the authentication state
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [user, setUser] = useState<User | null>(null); // State to store user data
-    const [isLoading, setIsLoading] = useState<boolean>(true); // Start loading until initial check is done
+    const [user, setUser] = useState<User | null>(null); 
+    const [isLoading, setIsLoading] = useState<boolean>(true); 
 
-    // Helper function to fetch user data and update state
     const fetchAndSetUser = useCallback(async () => {
         console.log("Attempting to fetch user details...");
         try {
-            const userData = await getCurrentUser(); // Call the API function
+            const userData = await getCurrentUser(); 
             console.log("User details fetched:", userData);
-            setUser(userData); // Store the fetched user object
-            setIsAuthenticated(true); // Mark as authenticated
-            return true; // Indicate success
+            setUser(userData); 
+            setIsAuthenticated(true); 
+            return true; 
         } catch (error) {
             console.error("Failed to fetch user details in context:", error);
-            setUser(null); // Clear user data on failure
-            setIsAuthenticated(false); // Mark as not authenticated
-            tokenStorage.clearTokens(); // Clear potentially invalid tokens
-            return false; // Indicate failure
+            setUser(null); 
+            setIsAuthenticated(false); 
+            tokenStorage.clearTokens(); 
+            return false; 
         }
-    }, []); // No dependencies needed for this specific helper
+    }, []); 
 
-    // Function to check authentication status (e.g., on page load)
     const checkAuth = useCallback(async () => {
         console.log("checkAuth called");
-        setIsLoading(true); // Start loading
+        setIsLoading(true); 
         const accessToken = tokenStorage.getAccessToken();
-        const refreshTokenVal = tokenStorage.getRefreshToken(); // Renamed to avoid conflict
+        const refreshTokenVal = tokenStorage.getRefreshToken(); 
 
         let authSuccess = false;
 
         if (accessToken) {
             console.log("Access token found, attempting to fetch user...");
-            // Try fetching user directly with existing access token
-            authSuccess = await fetchAndSetUser(); // This sets user and isAuthenticated
 
-            // If fetching user failed AND we have a refresh token, try refreshing
+            authSuccess = await fetchAndSetUser(); 
+
             if (!authSuccess && refreshTokenVal) {
                 console.warn("User fetch failed with access token, trying refresh...");
                 try {
                     const newAccessToken = await apiRefreshToken();
                     if (newAccessToken) {
                         console.log("Token refresh successful, fetching user again...");
-                        // If refresh successful, try fetching user again with the new token
+
                         authSuccess = await fetchAndSetUser();
                     } else {
                         console.log("Token refresh failed (no new token returned).");
-                        // Refresh failed, clear tokens
+
                         tokenStorage.clearTokens();
                         setUser(null);
                         setIsAuthenticated(false);
@@ -95,14 +87,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     setIsAuthenticated(false);
                 }
             } else if (!authSuccess) {
-                // Access token existed but user fetch failed, and no refresh token to try
+
                 console.log("User fetch failed, no refresh token to try.");
-                tokenStorage.clearTokens(); // Clear the invalid access token
+                tokenStorage.clearTokens(); 
                 setUser(null);
                 setIsAuthenticated(false);
             }
         } else if (refreshTokenVal) {
-            // Only refresh token exists, try refreshing
+
             console.log("No access token, trying refresh...");
             try {
                 const newAccessToken = await apiRefreshToken();
@@ -122,59 +114,53 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 setIsAuthenticated(false);
             }
         } else {
-            // No tokens found
+
             console.log("No tokens found.");
             setUser(null);
             setIsAuthenticated(false);
         }
 
-        // If all attempts failed ensure state reflects it
         if (!authSuccess) {
             setUser(null);
             setIsAuthenticated(false);
         }
 
-        setIsLoading(false); // Finish loading
+        setIsLoading(false); 
         console.log("checkAuth finished. isAuthenticated:", authSuccess);
-    }, [fetchAndSetUser]); // Add fetchAndSetUser as a dependency
+    }, [fetchAndSetUser]); 
 
-    // Run checkAuth once when the component mounts
     useEffect(() => {
         checkAuth();
-    }, [checkAuth]); // Dependency array ensures it runs once on mount
+    }, [checkAuth]); 
 
-    // Login function
     const login = useCallback(async (credentials: { username: string; password: string }) => {
         console.log("Login function called");
-        setIsLoading(true); // Indicate loading during login process
+        setIsLoading(true); 
         try {
-            await apiLogin(credentials); // Attempt API login (saves tokens on success)
+            await apiLogin(credentials); 
             console.log("API login successful, fetching user details...");
-            // Fetch user data immediately after successful API login
-            await fetchAndSetUser(); // Sets user and isAuthenticated state
+
+            await fetchAndSetUser(); 
         } catch (error) {
             console.error('Login process failed:', error);
-            tokenStorage.clearTokens(); // Ensure tokens are cleared on login failure
+            tokenStorage.clearTokens(); 
             setUser(null);
             setIsAuthenticated(false);
-            throw error; // Re-throw error for the LoginPage component to handle UI feedback
+            throw error; 
         } finally {
-            setIsLoading(false); // Finish loading state
+            setIsLoading(false); 
         }
-    }, [fetchAndSetUser]); // Add fetchAndSetUser as a dependency
+    }, [fetchAndSetUser]); 
 
-    // Logout function
     const logout = useCallback(() => {
         console.log("Logout function called");
         setIsAuthenticated(false);
         setUser(null);
         tokenStorage.clearTokens();
-        // Redirect to login page - using window.location forces a full page reload,
-        // which can be helpful to clear any residual state.
-        window.location.href = '/login';
-    }, []); // No dependencies needed
 
-    // Memoize the context value to prevent unnecessary re-renders of consumers
+        window.location.href = '/login';
+    }, []); 
+
     const contextValue = useMemo(() => ({
         isAuthenticated,
         user,
@@ -184,7 +170,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         checkAuth,
     }), [isAuthenticated, user, isLoading, login, logout, checkAuth]);
 
-    // Provide the context value to child components
     return (
         <AuthContext.Provider value={contextValue}>
             {children}

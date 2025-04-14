@@ -1,7 +1,7 @@
 // src/components/Common/Modal/Modal.tsx
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-// Removed Button import, assuming close is now styled internally
+
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -19,13 +19,13 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
             }
         };
         if (isOpen) {
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
             window.addEventListener('keydown', handleEsc);
         } else {
-            document.body.style.overflow = ''; // Restore scrolling
+            document.body.style.overflow = '';
         }
         return () => {
-            document.body.style.overflow = ''; // Ensure cleanup
+            document.body.style.overflow = '';
             window.removeEventListener('keydown', handleEsc);
         };
     }, [isOpen, onClose]);
@@ -43,9 +43,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
                         onClick={onClose}
                         className={styles.closeButton}
                         aria-label="Close modal"
-                        type="button" // Explicitly set type
+                        type="button"
                     >
-                        × {/* Use HTML entity */}
+                        × {}
                     </button>
                 </div>
                 <div className={styles.modalBody}>

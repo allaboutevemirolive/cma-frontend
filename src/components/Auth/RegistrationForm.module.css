@@ -32,7 +32,6 @@
 
 .select {
     composes: select from '../Course/CourseForm.module.css';
-    /* Adjust styles if needed, e.g., dark mode arrow */
 }
 
 @media (prefers-color-scheme: dark) {

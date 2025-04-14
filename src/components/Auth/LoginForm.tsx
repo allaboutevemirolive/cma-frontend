@@ -3,7 +3,7 @@ import React from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Button from '../Common/Button/Button';
-import Input from '../Common/Input/Input'; // Use the refined Input
+import Input from '../Common/Input/Input'; 
 import styles from './LoginForm.module.css';
 
 interface LoginFormProps {
@@ -26,16 +26,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
                 setSubmitting(false);
             }}
         >
-            {({ isSubmitting, errors, touched }) => ( // Get errors and touched from Formik
+            {({ isSubmitting, errors, touched }) => ( 
                 <Form className={styles.form}>
                     <Field name="username">
-                        {({ field }: any) => ( // Use Field render prop
-                            <Input // Use Input component
+                        {({ field }: any) => ( 
+                            <Input 
                                 {...field}
                                 id="username"
                                 label="Username"
                                 type="text"
-                                error={touched.username ? errors.username : undefined} // Pass error state
+                                error={touched.username ? errors.username : undefined} 
                                 disabled={isLoading || isSubmitting}
                                 autoComplete="username"
                             />
@@ -59,7 +59,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
                     <Button
                         type="submit"
                         variant="primary"
-                        size="large" // Make login button slightly larger
+                        size="large" 
                         isLoading={isLoading || isSubmitting}
                         disabled={isLoading || isSubmitting}
                         className={styles.submitButton}
