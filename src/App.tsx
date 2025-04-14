@@ -7,53 +7,46 @@ import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 import CourseListPage from './pages/CourseListPage';
 import CourseDetailPage from './pages/CourseDetailPage';
-import NotFoundPage from './pages/NotFoundPage'; // Optional
+import NotFoundPage from './pages/NotFoundPage';
+import RegistrationPage from './pages/RegistrationPage'; // <-- Import new page
 
 // Import Layout/Common Components if needed
-import Header from './components/Layout/Header'; // Example Header
-import Spinner from './components/Common/Spinner/Spinner'; // Example Loading Spinner
+import Header from './components/Layout/Header';
+import Spinner from './components/Common/Spinner/Spinner';
 
 // Component to protect routes
 const ProtectedRoute: React.FC = () => {
     const { isAuthenticated, isLoading } = useAuth();
 
     if (isLoading) {
-        // Show a loading indicator while checking auth state
         return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spinner /></div>;
     }
 
     if (!isAuthenticated) {
-        // Redirect to login page if not authenticated
-        // Pass the current location to redirect back after login (optional)
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" state={{ from: location }} replace />; // Pass current location
     }
 
-    // Render the child route component if authenticated
-    return <Outlet />; // Outlet renders the matched child route component
+    return <Outlet />;
 };
 
 
 function App() {
-    
-    // Optional: Prevent rendering routes until auth state is confirmed
-    // if (isLoading) {
-    //   return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spinner /></div>;
-    // }
 
     return (
         <>
-            <Header /> {/* Example Header component */}
-            <main style={{ padding: '1rem' }}> {/* Add some basic layout padding */}
+            <Header />
+            <main style={{ padding: '1rem' }}>
                 <Routes>
-                    {/* Public Route */}
+                    {/* Public Routes */}
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegistrationPage />} />
 
                     {/* Protected Routes */}
                     <Route element={<ProtectedRoute />}>
-                        <Route path="/" element={<Navigate to="/courses" replace />} /> {/* Redirect root to courses */}
+                        <Route path="/" element={<Navigate to="/courses" replace />} />
                         <Route path="/courses" element={<CourseListPage />} />
                         <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-                        {/* Add other protected routes here (e.g., /courses/create if using a page) */}
+                        {/* Add other protected routes here */}
                     </Route>
 
                     {/* Catch-all 404 Not Found Route */}

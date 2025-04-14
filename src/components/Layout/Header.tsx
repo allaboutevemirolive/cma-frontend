@@ -25,19 +25,27 @@ const Header: React.FC = () => {
                             >
                                 Courses
                             </NavLink>
-                            {/* Add other authenticated links here (e.g., Profile) */}
+                            {/* Add other authenticated links here */}
                             <span className={styles.userInfo}>Welcome, {user?.username || 'User'}</span>
                             <Button onClick={logout} variant="secondary" size="small">
                                 Logout
                             </Button>
                         </>
                     ) : (
-                        <NavLink
-                            to="/login"
-                            className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink}
-                        >
-                            Login
-                        </NavLink>
+                        <> {/* Wrap links in fragment */}
+                            <NavLink
+                                to="/login"
+                                className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink}
+                            >
+                                Login
+                            </NavLink>
+                             <NavLink
+                                to="/register"
+                                className={({ isActive }) => isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink}
+                            >
+                                Register
+                            </NavLink>
+                        </>
                     )}
                 </nav>
             </div>

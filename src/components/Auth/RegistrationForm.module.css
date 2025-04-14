@@ -1,0 +1,42 @@
+/* src/components/Auth/RegistrationForm.module.css */
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+/* Input Group, Label, ErrorMessage - Handled by Input component */
+
+.submitButton {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+/* Inherit common styles for select dropdowns from CourseForm */
+.inputGroup {
+    composes: inputGroup from '../Course/CourseForm.module.css';
+}
+
+.label {
+    composes: label from '../Course/CourseForm.module.css';
+}
+
+.errorMessage {
+    composes: errorMessage from '../Course/CourseForm.module.css';
+}
+
+.errorInput {
+    composes: errorInput from '../Course/CourseForm.module.css';
+}
+
+.select {
+    composes: select from '../Course/CourseForm.module.css';
+    /* Adjust styles if needed, e.g., dark mode arrow */
+}
+
+@media (prefers-color-scheme: dark) {
+    .select {
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%239CA3AF"><path d="M7 10l5 5 5-5H7z"/></svg>');
+    }
+}
